@@ -138,15 +138,57 @@ I18nClient.createWithUniverseI18n = ({ universeI18n, ...context }, params) => {
   };
   return new I18nClient({ ...context, translationStore }, params);
 };
-/*
-I18nClient.createWithCollectionStore = ({  ...context }, params) => {
-  const translate = (keyOrNamespace, params) => {
-    const selector =
-    collection.findOne(selector)
-  }
 
+I18nClient.createWithCollectionStore = ({ ...context }, params) => {
+  const translate = (keyOrNamespace, params) => {
+
+  };
+
+  // const results = collection.find({key: {$regex: `${keyOrNamespace}/*`}).fetch();
+
+// collection:
+
+/**
+  key: "user.firstname", value_de: "Vorname", value_fr: "Prenom"
+  key: "user.lastname", value_de: "Nachname"
+  key: "user.language.label": value_de: "Sprache"
+  key: "user.language", value_de: "Sprache" // error ?
+  t("user") --> {firstname: "Vorname", lastname: "Nachname", language: {label: "Sprache"}}
+  t("user.firstname") --> "Vorname"
+
+  t("user") -->
+
+**/
+
+//  Meteor.publish("")
+/*
+
+  const object = {}
+  const getValueKey = (locale) => `value_${locale}`;
+  const getValue = (entry, locale) => {
+
+    if(_.has(entry, getValueKey(locale))) {
+      return entry[getValueKey(locale)]
+    } else {
+      return entry.key;
+    }
+  }
+  const stringOrObject = unflatten(
+    _.chain(results2)
+    .sortBy(({key}) => key.length)
+    .keyBy("key")
+    .mapValues(entry => getValue(entry, locale))
+    .value(),
+  {overwrite: true})
+
+*/
+  const translationStore = {
+    translate,
+    getLocale: () => console.error('todo'),
+    setLocale: () => console.error('todo'),
+  };
   return new I18nClient({ ...context, translationStore }, params);
 };
 
-*/
+
 export default I18nClient;
