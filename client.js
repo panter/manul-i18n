@@ -11,10 +11,11 @@ import evalSimpleSchemaRegexKeys from './eval_simpleschema_regex_keys';
 
 class I18nClient {
 
-  constructor({ translationStore, SimpleSchema, FlowRouter }, { supportedLocales, defaultLocale = 'en' }) {
+  constructor({ SimpleSchema, FlowRouter }, { translationStore, supportedLocales, defaultLocale = 'en', shouldBypass = () => false }) {
     this.FlowRouter = FlowRouter;
     this.SimpleSchema = SimpleSchema;
     this.translationStore = translationStore;
+    this.shouldBypass = shouldBypass;
 
     this.supportedLocales = supportedLocales;
     this.defaultLocale = defaultLocale;
@@ -24,6 +25,9 @@ class I18nClient {
   }
 
   t(keyOrNamespace, props) {
+    if (this.shouldBypass()) {
+      return keyOrNamespace;
+    }
     return this.translationStore.translate(keyOrNamespace, props);
   }
 
