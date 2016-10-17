@@ -1,5 +1,6 @@
 
-import Client from './client';
+import I18nClient from './client';
+
 import T from './translation_container';
 
-export { Client, T };
+export { I18nClient, T };
