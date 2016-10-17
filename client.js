@@ -107,6 +107,7 @@ class I18nClient {
         };
       });
     };
+
     _addSubSchemaTranslations(null, translations);
     const translatedScheme = new this.SimpleSchema([schema, translatedDef]);
     const simpleSchemaMessages = evalSimpleSchemaRegexKeys(

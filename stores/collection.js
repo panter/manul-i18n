@@ -18,8 +18,9 @@ export default class {
     } else {
       this.initServer();
     }
-
-    this.initMethods();
+    if (Meteor.isDevelopment) {
+      this.initDevelopMethod();
+    }
   }
   initClient() {
     const Tracker = require('meteor/tracker').Tracker;
@@ -28,7 +29,8 @@ export default class {
     this.locale = new ReactiveVar();
     this.autorun = Tracker.autorun(() => {
       const locale = this.getLocale();
-      Meteor.subscribe(this.publicationName, locale);
+      console.log({ locale });
+      this.subscription = Meteor.subscribe(this.publicationName, locale);
     });
   }
 
@@ -43,7 +45,7 @@ export default class {
       },
     };
     Meteor.publish(this.publicationName, (locale) => {
-      return this.collection.find({}, { fields: { key: true, [`value_${locale}`]: true } });
+      return this.collection.find({}, { fields: { key: true, [this.getValueKey(locale)]: true } });
     });
   }
 
@@ -54,9 +56,14 @@ export default class {
   setLocale(locale) {
     return this.locale.set(locale);
   }
-
+  getValueKey(locale) {
+    return `value_${locale}`;
+  }
 
   translate(keyOrNamespace, { _locale = this.getLocale(), ...params } = {}) {
+    if (!this.subscription.ready()) {
+      return '';
+    }
     if (!keyOrNamespace) {
       return '';
     }
@@ -65,10 +72,10 @@ export default class {
 
     const open = '{$';
     const close = '}';
-    const getValueKey = locale => `value_${locale}`;
+
     const getValue = (entry, locale) => {
-      if (_.has(entry, getValueKey(locale))) {
-        let value = entry[getValueKey(locale)];
+      if (_.has(entry, this.getValueKey(locale))) {
+        let value = entry[this.getValueKey(locale)];
 
         Object.keys(params).forEach((param) => {
           value = value.split(open + param + close).join(params[param]);
@@ -76,32 +83,36 @@ export default class {
 
         return value;
       }
-      return entry.key;
+      return entry._id;
     };
     const object = unflatten(
          _.chain(results)
-         .sortBy(({ key }) => key.length)
-         .keyBy('key')
+         .sortBy(({ _id }) => _id.length)
+         .keyBy('_id')
          .mapValues(entry => getValue(entry, _locale))
          .value(),
        { overwrite: true });
-    console.log(keyOrNamespace, object);
-    return _.get(object, keyOrNamespace);
+    const objectOrString = _.get(object, keyOrNamespace);
+    if (!_.isString(objectOrString) && _.isEmpty(objectOrString)) {
+      // empty object or undefined
+      return keyOrNamespace;
+    }
+    return objectOrString;
   }
 
   findResultsForKey(keyOrNamespace) {
-    return this.collection.find({ key: { $regex: `${keyOrNamespace}/*` } }).fetch();
+    return this.collection.find({ _id: { $regex: `${keyOrNamespace}/*` } }).fetch();
   }
 
-  initMethods() {
+  initDevelopMethod() {
     const store = this;
     Meteor.methods({
-      [this.methodLogMissingKeyName](key, locale) {
+      [this.methodLogMissingKeyName](key) {
         console.log('missing property', key);
         const results = store.findResultsForKey(key);
         // also check on the server if really empty
         if (results.length === 0) {
-          store.collection.upsert({ key }, { $set: { [`value_${locale}`]: `${locale}: ${key}` } });
+          store.collection.upsert(key, { $set: { [this.getValueKey(locale)]: `${locale}: ${key}` } });
         }
       },
     });
