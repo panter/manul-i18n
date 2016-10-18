@@ -18,10 +18,8 @@ export default class {
     } else {
       this.initServer();
     }
-    if (Meteor.isDevelopment) {
-      this.initDevelopMethod();
-    }
   }
+
   initClient() {
     const Tracker = require('meteor/tracker').Tracker;
     const ReactiveVar = require('meteor/reactive-var').ReactiveVar;
@@ -29,8 +27,9 @@ export default class {
     this.locale = new ReactiveVar();
     this.autorun = Tracker.autorun(() => {
       const locale = this.getLocale();
-      console.log({ locale });
-      this.subscription = Meteor.subscribe(this.publicationName, locale);
+      if (locale) {
+        this.subscription = Meteor.subscribe(this.publicationName, locale);
+      }
     });
   }
 
@@ -102,20 +101,6 @@ export default class {
 
   findResultsForKey(keyOrNamespace) {
     return this.collection.find({ _id: { $regex: `${keyOrNamespace}/*` } }).fetch();
-  }
-
-  initDevelopMethod() {
-    const store = this;
-    Meteor.methods({
-      [this.methodLogMissingKeyName](key) {
-        console.log('missing property', key);
-        const results = store.findResultsForKey(key);
-        // also check on the server if really empty
-        if (results.length === 0) {
-          store.collection.upsert(key, { $set: { [this.getValueKey(locale)]: `${locale}: ${key}` } });
-        }
-      },
-    });
   }
 
 

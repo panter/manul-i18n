@@ -11,11 +11,22 @@ import evalSimpleSchemaRegexKeys from './eval_simpleschema_regex_keys';
 
 class I18nClient {
 
-  constructor({ SimpleSchema, FlowRouter }, { translationStore, supportedLocales, defaultLocale = 'en', shouldBypass = () => false }) {
+  constructor({
+      SimpleSchema,
+      FlowRouter,
+      translationStore,
+      supportedLocales,
+      defaultLocale = 'en',
+      shouldBypass = () => false,
+      editRoute,
+      isEditor = () => false,
+    }) {
     this.FlowRouter = FlowRouter;
     this.SimpleSchema = SimpleSchema;
     this.translationStore = translationStore;
     this.shouldBypass = shouldBypass;
+    this.isEditor = isEditor;
+    this.editRoute = editRoute;
 
     this.supportedLocales = supportedLocales;
     this.defaultLocale = defaultLocale;

@@ -2,7 +2,7 @@
 export default function evalSimpleSchemaRegexKeys(messages) {
   if (messages.regEx) {
     const regEx = messages.regEx.map(({ msg, exp }) => {
-      return { msg, exp: exp && exp.split('.').reduce((o, i) => o[i], global) };
+      return { msg, exp: exp && exp.split('.').reduce((o, i) => (o && o[i]), global) };
     });
     return { ...messages, regEx };
   }

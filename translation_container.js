@@ -3,24 +3,30 @@ import { setComposerStub } from 'react-komposer';
 import React from 'react';
 
 export const composer = ({ context, children, ...params }, onData) => {
-  const { i18n, Meteor } = context();
+  const { i18n, routeUtils } = context();
   const translation = i18n.t(children, params);
   const locale = i18n.getLocale();
-  const isDevelopment = Meteor.isDevelopment;
-  onData(null, { translation, locale, isDevelopment });
+  const isEditor = i18n.isEditor();
+  const shouldBypass = i18n.shouldBypass();
+  const gotoEdit = () => routeUtils.go(i18n.editRoute, { _id: children });
+  // shouldBypass is already handled by i18n.t, (shouldBypass = true shows the key instead of the translation)
+  // but we also want to allow to click on it to jump to the translation when bypassing is active
+  onData(null, { gotoEdit, translation, locale, isEditor, shouldBypass });
 };
 export const depsMapper = (context, actions) => ({
   context: () => context,
 });
 
-const Component = ({ isDevelopment, locale, children, _tagType, _props = {}, translation }) => {
-  const devProps = {};
-  if (isDevelopment) {
-    devProps.title = children;
+const Component = ({ isEditor, shouldBypass, gotoEdit, locale, children, _tagType, _props = {}, translation }) => {
+  const editorProps = {};
+  if (isEditor) {
+    editorProps.title = children;
+    editorProps.style = { cursor: shouldBypass ? 'pointer' : null };
+    editorProps.onClick = () => (shouldBypass ? gotoEdit() : null);
   }
   return React.createElement(_tagType || 'span', {
     ..._props,
-    ...devProps,
+    ...editorProps,
     dangerouslySetInnerHTML: {
       __html: translation,
     }, key: locale,
