@@ -41,7 +41,7 @@ const T = composeAll(
 )(Component);
 
 setComposerStub(T, (props) => {
-  return { translation: () => props.children };
+  return { translation: props.children };
 });
 
 
