@@ -17,14 +17,14 @@ class I18nClient {
       translationStore,
       supportedLocales,
       defaultLocale = 'en',
-      shouldBypass = () => false,
+      editModeHighlighting = () => false,
       editRoute,
       isEditor = () => false,
     }) {
     this.FlowRouter = FlowRouter;
     this.SimpleSchema = SimpleSchema;
     this.translationStore = translationStore;
-    this.shouldBypass = shouldBypass;
+    this.editModeHighlighting = editModeHighlighting;
     this.isEditor = isEditor;
     this.editRoute = editRoute;
 
@@ -36,7 +36,7 @@ class I18nClient {
   }
 
   t(keyOrNamespace, props) {
-    if (this.shouldBypass()) {
+    if (this.editModeHighlighting()) {
       return keyOrNamespace;
     }
     return this.translationStore.translate(keyOrNamespace, props);

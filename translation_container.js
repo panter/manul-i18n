@@ -7,22 +7,22 @@ export const composer = ({ context, children, ...params }, onData) => {
   const translation = i18n.t(children, params);
   const locale = i18n.getLocale();
   const isEditor = i18n.isEditor();
-  const shouldBypass = i18n.shouldBypass();
+  const editModeHighlighting = i18n.editModeHighlighting();
   const gotoEdit = () => routeUtils.go(i18n.editRoute, { _id: children });
-  // shouldBypass is already handled by i18n.t, (shouldBypass = true shows the key instead of the translation)
+  // editModeHighlighting is already handled by i18n.t, (editModeHighlighting = true shows the key instead of the translation)
   // but we also want to allow to click on it to jump to the translation when bypassing is active
-  onData(null, { gotoEdit, translation, locale, isEditor, shouldBypass });
+  onData(null, { gotoEdit, translation, locale, isEditor, editModeHighlighting });
 };
 export const depsMapper = (context, actions) => ({
   context: () => context,
 });
 
-const Component = ({ isEditor, shouldBypass, gotoEdit, locale, children, _tagType, _props = {}, translation }) => {
+const Component = ({ isEditor, editModeHighlighting, gotoEdit, locale, children, _tagType, _props = {}, translation }) => {
   const editorProps = {};
   if (isEditor) {
     editorProps.title = children;
-    editorProps.style = { cursor: shouldBypass ? 'pointer' : null };
-    editorProps.onClick = () => (shouldBypass ? gotoEdit() : null);
+    editorProps.style = { cursor: editModeHighlighting ? 'pointer' : null };
+    editorProps.onClick = () => (editModeHighlighting ? gotoEdit() : null);
   }
   return React.createElement(_tagType || 'span', {
     ..._props,
