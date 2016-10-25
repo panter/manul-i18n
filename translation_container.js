@@ -35,8 +35,9 @@ const Component = ({ isEditor, editModeHighlighting, gotoEdit, locale, children,
 
 Component.displayName = 'T';
 
+const composeWithTrackerServerSave = Meteor.isServer ? compose : composeWithTracker;
 const T = composeAll(
-  composeWithTracker(composer),
+  composeWithTrackerServerSave(composer),
   useDeps(depsMapper)
 )(Component);
 
