@@ -34,33 +34,31 @@ export default class {
   }
 
   initServer() {
-    let value = null;
-    this.locale = {
-      get() {
-        return value;
-      },
-      set(newValue) {
-        value = newValue;
-      },
-    };
     Meteor.publish(this.publicationName, (locale) => {
       return this.collection.find({}, { fields: { key: true, [this.getValueKey(locale)]: true } });
     });
   }
 
   getLocale() {
+    if (Meteor.isServer) {
+      throw new Meteor.Error('getLocale can only be called on the client');
+    }
     return this.locale.get();
   }
 
   setLocale(locale) {
+    if (Meteor.isServer) {
+      throw new Meteor.Error('setLocale can only be called on the client');
+    }
     return this.locale.set(locale);
   }
+
   getValueKey(locale) {
     return `value_${locale}`;
   }
 
   translate(keyOrNamespace, { _locale = this.getLocale(), ...params } = {}) {
-    if (!this.subscription.ready()) {
+    if (Meteor.isClient && !this.subscription.ready()) {
       return '';
     }
     if (!keyOrNamespace) {
