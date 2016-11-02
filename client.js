@@ -35,8 +35,8 @@ class I18nClient {
     this.setLocale(defaultLocale);
   }
 
-  t(keyOrNamespace, props) {
-    if (this.editModeHighlighting()) {
+  t(keyOrNamespace, props, { disableEditorBypass = false } = {}) {
+    if (!disableEditorBypass && this.editModeHighlighting()) {
       return keyOrNamespace;
     }
     return this.translationStore.translate(keyOrNamespace, props);

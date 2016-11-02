@@ -2,9 +2,9 @@ import { useDeps, composeAll, composeWithTracker, compose } from 'mantra-core';
 import { setComposerStub } from 'react-komposer';
 import React from 'react';
 
-export const composer = ({ context, children, ...params }, onData) => {
+export const composer = ({ context, children, disableEditorBypass = false, ...params }, onData) => {
   const { i18n, routeUtils } = context();
-  const translation = i18n.t(children, params);
+  const translation = i18n.t(children, params, { disableEditorBypass });
   const locale = i18n.getLocale();
   const isEditor = i18n.isEditor();
   const editModeHighlighting = i18n.editModeHighlighting();
@@ -41,9 +41,9 @@ const T = composeAll(
   useDeps(depsMapper)
 )(Component);
 
-setComposerStub(T, (props) => {
-  return { translation: props.children };
-});
+setComposerStub(T, props =>
+   ({ translation: props.children })
+);
 
 
 export default T;
