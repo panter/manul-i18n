@@ -21,7 +21,7 @@ import _ from 'lodash';
                +mMNNNmMNo`
                  .+sys:
 
-      "I got no time for the jibba-jabba."
+      "The jibba jabba stops here!"
 
 
   Mr. T translates your stuff:
