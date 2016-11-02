@@ -21,7 +21,7 @@ const Component = ({ isEditor, editModeHighlighting, gotoEdit, locale, children,
   const editorProps = {};
   if (isEditor) {
     editorProps.title = children;
-    editorProps.style = { cursor: editModeHighlighting ? 'pointer' : null };
+    editorProps.style = { cursor: editModeHighlighting ? 'pointer' : null, textTransform: editModeHighlighting && 'none' };
     editorProps.onClick = () => (editModeHighlighting ? gotoEdit() : null);
   }
   return React.createElement(_tagType || 'span', {
