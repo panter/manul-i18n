@@ -98,6 +98,8 @@ class I18nClient {
         let label = null;
         let hintText = null;
         let hintTitle = null;
+        let listAdd = null;
+        let listDel = null;
         if (fieldTranslation) {
           if (_.isString(fieldTranslation)) {
             label = fieldTranslation;
@@ -105,6 +107,8 @@ class I18nClient {
             label = fieldTranslation.label;
             hintText = fieldTranslation.hintText;
             hintTitle = fieldTranslation.hintTitle;
+            listAdd = fieldTranslation.listAdd;
+            listDel = fieldTranslation.listDel;
           }
         }
         // recursivly add subfields as well, but flat
@@ -117,6 +121,8 @@ class I18nClient {
             transform: defaultTransform,
             hintText,
             hintTitle,
+            listAdd,
+            listDel,
             ...fieldDefinition.uniforms, // can override default transform
           },
         };
