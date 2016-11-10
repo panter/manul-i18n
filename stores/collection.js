@@ -92,7 +92,7 @@ export default class {
     const objectOrString = _.get(object, keyOrNamespace);
     if (!_.isString(objectOrString) && _.isEmpty(objectOrString)) {
       // empty object or undefined
-      return keyOrNamespace;
+      return undefined;
     }
     return objectOrString;
   }
