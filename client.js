@@ -9,6 +9,9 @@ i18n.translateSchema(simpleSchema): adds translation to the simpleSchema
 import _ from 'lodash';
 import evalSimpleSchemaRegexKeys from './eval_simpleschema_regex_keys';
 
+const DEFAULT_OPTIONS = {
+  useFallbackForMissing: true,
+};
 class I18nClient {
 
   constructor({
@@ -20,6 +23,7 @@ class I18nClient {
       editModeHighlighting = () => false,
       editRoute,
       isEditor = () => false,
+      options = DEFAULT_OPTIONS,
     }) {
     this.FlowRouter = FlowRouter;
     this.SimpleSchema = SimpleSchema;
@@ -30,7 +34,7 @@ class I18nClient {
 
     this.supportedLocales = supportedLocales;
     this.defaultLocale = defaultLocale;
-
+    this.options = options;
     this.changeCallbacks = [];
     this.setLocale(defaultLocale);
   }
@@ -39,9 +43,26 @@ class I18nClient {
     if (!disableEditorBypass && this.editModeHighlighting()) {
       return keyOrNamespace;
     }
-    return this.translationStore.translate(keyOrNamespace, props);
+    let translation = this.translationStore.translate(keyOrNamespace, props);
+    console.log(keyOrNamespace, translation);
+    if (!_.isNil(translation)) {
+      return translation;
+    }
+    const fallbackLocale = this.getFallbackLocale();
+    if (this.options.useFallbackForMissing && this.getLocale() !== fallbackLocale) {
+      debugger;
+      translation = this.translationStore.translate(
+          keyOrNamespace, { ...props, _locale: fallbackLocale }
+        );
+    }
+      // if still nil and is editor, return key
+    if (!_.isNil(translation)) {
+      return translation;
+    } else if (this.isEditor()) {
+      return keyOrNamespace;
+    }
+    return null; // we tried :-(
   }
-
 
   supports(locale) {
     return this.supportedLocales.indexOf(locale) !== -1;

@@ -34,9 +34,9 @@ export default class {
   }
 
   initServer() {
-    Meteor.publish(this.publicationName, (locale) => {
-      return this.collection.find({}, { fields: { key: true, [this.getValueKey(locale)]: true } });
-    });
+    Meteor.publish(this.publicationName, locale =>
+       this.collection.find({}, { fields: { key: true, [this.getValueKey(locale)]: true } })
+    );
   }
 
   getLocale() {
@@ -92,7 +92,7 @@ export default class {
     const objectOrString = _.get(object, keyOrNamespace);
     if (!_.isString(objectOrString) && _.isEmpty(objectOrString)) {
       // empty object or undefined
-      return undefined;
+      return null;
     }
     return objectOrString;
   }
