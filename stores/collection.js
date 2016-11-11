@@ -21,21 +21,15 @@ export default class {
   }
 
   initClient() {
-    const Tracker = require('meteor/tracker').Tracker;
     const ReactiveVar = require('meteor/reactive-var').ReactiveVar;
 
     this.locale = new ReactiveVar();
-    this.autorun = Tracker.autorun(() => {
-      const locale = this.getLocale();
-      if (locale) {
-        this.subscription = Meteor.subscribe(this.publicationName, locale);
-      }
-    });
+    this.subscription = Meteor.subscribe(this.publicationName);
   }
 
   initServer() {
-    Meteor.publish(this.publicationName, locale =>
-       this.collection.find({}, { fields: { key: true, [this.getValueKey(locale)]: true } })
+    Meteor.publish(this.publicationName, () =>
+       this.collection.find({})
     );
   }
 
@@ -80,7 +74,7 @@ export default class {
 
         return value;
       }
-      return entry._id;
+      return null;
     };
     const object = unflatten(
          _.chain(results)
