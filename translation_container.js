@@ -39,6 +39,17 @@ import _ from 'lodash';
   also works with function-children:
   <T doc={page} _id="meta.title">{(altText) => <img alt={altText} src="..." />}</T>
 
+  If you have simple object with keys as locales, e.g.
+  const myProperty = {
+    de: "German",
+    fr: "French",
+    it: "English"
+  }
+
+  you can also use Mr. T to display the right translation (empty path)
+
+  <T doc={myProperty} />
+
   Advanced:
   ---------
 
@@ -58,7 +69,8 @@ import _ from 'lodash';
 export const composer = ({ context, doc = null, _id: _idParam = null, children, disableEditorBypass = false, ...params }, onData) => {
   const { i18n, routeUtils } = context();
   const locale = i18n.getLocale();
-  const _id = _idParam || (_.isString(children) ? children : 'missing _id!');
+
+  const _id = _idParam || (_.isString(children) ? children : null);
   const isEditor = i18n.isEditor();
   let translation = '';
   let gotoEdit = _.noop;
@@ -69,7 +81,7 @@ export const composer = ({ context, doc = null, _id: _idParam = null, children, 
     // we also want to allow to click on it to jump to the translation when bypassing is active
     gotoEdit = () => routeUtils.go(i18n.editRoute, { _id });
   } else {
-    translation = _.get(doc, `${_id}.${locale}`);
+    translation = i18n.tDoc(doc, _id);
     // do not highlight
     editModeHighlighting = false;
     // no support for gotoEdit yet.

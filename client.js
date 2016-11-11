@@ -40,17 +40,18 @@ class I18nClient {
   }
 
   t(keyOrNamespace, props, { disableEditorBypass = false } = {}) {
+    if (!keyOrNamespace) {
+      return '! no translationId given !';
+    }
     if (!disableEditorBypass && this.editModeHighlighting()) {
       return keyOrNamespace;
     }
     let translation = this.translationStore.translate(keyOrNamespace, props);
-    console.log(keyOrNamespace, translation);
     if (!_.isNil(translation)) {
       return translation;
     }
     const fallbackLocale = this.getFallbackLocale();
     if (this.options.useFallbackForMissing && this.getLocale() !== fallbackLocale) {
-      debugger;
       translation = this.translationStore.translate(
           keyOrNamespace, { ...props, _locale: fallbackLocale }
         );
@@ -62,6 +63,28 @@ class I18nClient {
       return keyOrNamespace;
     }
     return null; // we tried :-(
+  }
+
+  /**
+    translate a certain property from a document.
+    It will check if the document has doc[propertyKey].de, .fr, etc.
+
+    if propertyKey is not set, it will fetch doc.de, doc.fr, etc.
+  **/
+  tDoc(doc, propertyKey = null) {
+    // closure helpers
+    const path = locale => (propertyKey ? `${propertyKey}.${locale}` : locale);
+    const t = locale => _.get(doc, path(locale));
+
+    const translation = t(this.getLocale());
+    if (!_.isNil(translation)) {
+      return translation;
+    }
+    const fallbackLocale = this.getFallbackLocale();
+    if (this.options.useFallbackForMissing && this.getLocale() !== fallbackLocale) {
+      return t(fallbackLocale);
+    }
+    return null; // no key fallback at the moment
   }
 
   supports(locale) {
