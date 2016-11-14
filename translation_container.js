@@ -1,5 +1,6 @@
 import { useDeps, composeAll, composeWithTracker, compose } from 'mantra-core';
 import { setComposerStub } from 'react-komposer';
+import I18nClient from '/manul-i18n/client';
 import React from 'react';
 import _ from 'lodash';
 /**
@@ -66,40 +67,53 @@ import _ from 'lodash';
   © Panter 2016
 
 **/
-export const composer = ({ context, doc = null, _id: _idParam = null, children, disableEditorBypass = false, ...params }, onData) => {
+
+const getTranslationId = ({ children, _id }) => (
+  _id || (_.isString(children) ? children : null)
+);
+
+const getTranslation = (i18n, { doc, _id, disableEditorBypass, children, ...params }) => {
+  const translationId = getTranslationId({ children, _id });
+  if (doc) {
+    return i18n.tDoc(doc, translationId);
+  }
+  return i18n.t(translationId, params, { disableEditorBypass });
+};
+
+/**
+this function is outside of the composer so that it can be used in stubbing mode more easily
+**/
+const getTranslationProps = (context, props) => {
   const { i18n, routeUtils } = context();
   const locale = i18n.getLocale();
-
-  const _id = _idParam || (_.isString(children) ? children : null);
   const isEditor = i18n.isEditor();
-  let translation = '';
-  let gotoEdit = _.noop;
-  // editModeHighlighting is already handled by i18n.t, (editModeHighlighting = true shows the _id instead of the translation)
+  const translationId = getTranslationId(props);
+  const translation = getTranslation(i18n, props);
   let editModeHighlighting = i18n.editModeHighlighting();
-  if (!doc) {
-    translation = i18n.t(_id, params, { disableEditorBypass });
-    // we also want to allow to click on it to jump to the translation when bypassing is active
-    gotoEdit = () => routeUtils.go(i18n.editRoute, { _id });
-  } else {
-    translation = i18n.tDoc(doc, _id);
-    // do not highlight
+  let gotoEdit = () => routeUtils.go(i18n.editRoute, { _id: translationId });
+  if (props.doc) {
+      // no edit mode highlighting for docs yet and no gotoEdit;
+    gotoEdit = _.noop;
     editModeHighlighting = false;
-    // no support for gotoEdit yet.
   }
+  return { translationId, gotoEdit, translation, locale, isEditor, editModeHighlighting };
+};
 
-  onData(null, { _id, gotoEdit, translation, locale, isEditor, editModeHighlighting });
+
+export const composer = ({ context, ...props }, onData) => {
+  onData(null, getTranslationProps(context, props));
 };
 export const depsMapper = (context, actions) => ({
   context: () => context,
 });
 
-const Component = ({ isEditor, editModeHighlighting, gotoEdit, locale, _id, _tagType, _props = {}, translation, children }) => {
+const Component = ({ isEditor, editModeHighlighting, gotoEdit, locale, translationId, _tagType, _props = {}, translation, children }) => {
   const editorProps = {};
   if (_.isFunction(children)) {
     return children(translation);
   }
   if (isEditor) {
-    editorProps.title = _id;
+    editorProps.title = translationId;
     editorProps.style = { cursor: editModeHighlighting ? 'pointer' : null, textTransform: editModeHighlighting && 'none' };
     editorProps.onClick = () => (editModeHighlighting && gotoEdit ? gotoEdit() : null);
   }
@@ -121,9 +135,24 @@ const T = composeAll(
   useDeps(depsMapper)
 )(Component);
 
-setComposerStub(T, props =>
-   ({ translation: props.children })
-);
+
+setComposerStub(T, (props) => {
+  const stubContext = () => ({
+    i18n: new I18nClient({
+      translationStore: {
+        setLocale: _.noop,
+        getLocale: () => 'de',
+        translate: key => key,
+      },
+      supportedLocales: ['de'],
+      defaultLocale: 'de',
+    }),
+    routeUtils: {
+      go: _.noop,
+    },
+  });
+  return getTranslationProps(stubContext, props);
+});
 
 
 export default T;
