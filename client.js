@@ -21,6 +21,7 @@ class I18nClient {
       supportedLocales,
       defaultLocale = 'en',
       editModeHighlighting = () => false,
+      shouldShowKeysAsFallback = () => false,
       editRoute,
       isEditor = () => false,
       options = DEFAULT_OPTIONS,
@@ -29,6 +30,7 @@ class I18nClient {
     this.SimpleSchema = SimpleSchema;
     this.translationStore = translationStore;
     this.editModeHighlighting = () => editModeHighlighting() && isEditor();
+    this.shouldShowKeysAsFallback = shouldShowKeysAsFallback;
     this.isEditor = isEditor;
     this.editRoute = editRoute;
 
@@ -56,10 +58,10 @@ class I18nClient {
           keyOrNamespace, { ...props, _locale: fallbackLocale }
         );
     }
-      // if still nil and is editor, return key
+      // if still nil and is editor, return key if allowed
     if (!_.isNil(translation)) {
       return translation;
-    } else if (this.isEditor()) {
+    } else if (this.shouldShowKeysAsFallback()) {
       return keyOrNamespace;
     }
     return null; // we tried :-(
