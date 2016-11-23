@@ -29,7 +29,7 @@ class I18nClient {
     this.FlowRouter = FlowRouter;
     this.SimpleSchema = SimpleSchema;
     this.translationStore = translationStore;
-    this.editModeHighlighting = () => isEditor() && editModeHighlighting();
+    this.editModeHighlighting = editModeHighlighting;
     this.shouldShowKeysAsFallback = shouldShowKeysAsFallback;
     this.isEditor = isEditor;
     this.editRoute = editRoute;
