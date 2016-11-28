@@ -146,6 +146,7 @@ class I18nClient {
         let hintTitle = null;
         let listAdd = null;
         let listDel = null;
+        let toggleOptionalLabel = null;
         if (fieldTranslation) {
           if (_.isString(fieldTranslation)) {
             label = fieldTranslation;
@@ -153,6 +154,7 @@ class I18nClient {
             label = fieldTranslation.label;
             hintText = fieldTranslation.hintText;
             hintTitle = fieldTranslation.hintTitle;
+            toggleOptionalLabel = fieldTranslation.toggleOptionalLabel;
             listAdd = fieldTranslation.listAdd;
             listDel = fieldTranslation.listDel;
           }
@@ -169,6 +171,7 @@ class I18nClient {
             hintTitle,
             listAdd,
             listDel,
+            toggleOptionalLabel,
             ...fieldDefinition.uniforms, // can override default transform
           },
         };
