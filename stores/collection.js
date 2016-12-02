@@ -92,7 +92,13 @@ export default class {
   }
 
   findResultsForKey(keyOrNamespace) {
-    return this.collection.find({ _id: { $regex: `${keyOrNamespace}/*` } }).fetch();
+    const result = this.collection.findOne(keyOrNamespace);
+    if (!result) {
+      // a parent is requested, find all childs that start with keyOrNamespace
+      // this is slow, so we do it only if there is no exact key
+      return this.collection.find({ _id: { $regex: `${keyOrNamespace}/*` } }).fetch();
+    }
+    return [result];
   }
 
 
