@@ -6,7 +6,7 @@ import { unflatten } from 'flat';
 export default class {
   constructor({
       collection,
-      publicationName = 'publicationName',
+      publicationName = 'translations',
       methodLogMissingKeyName = 'translations.logMissingKey',
       } = {}) {
     this.methodLogMissingKeyName = methodLogMissingKeyName;
@@ -52,9 +52,6 @@ export default class {
   }
 
   translate(keyOrNamespace, { _locale = this.getLocale(), ...params } = {}) {
-    if (Meteor.isClient && !this.subscription.ready()) {
-      return '';
-    }
     if (!keyOrNamespace) {
       return '';
     }
