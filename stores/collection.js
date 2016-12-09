@@ -66,7 +66,8 @@ export default class {
         let value = entry[this.getValueKey(locale)];
 
         Object.keys(params).forEach((param) => {
-          value = value.split(open + param + close).join(params[param]);
+          const substitution = _.get(params, param, '');
+          value = value.split(open + param + close).join(substitution);
         });
 
         return value;
