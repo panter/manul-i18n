@@ -84,13 +84,13 @@ const getTranslation = (i18n, { doc, _id, disableEditorBypass, children, ...para
 this function is outside of the composer so that it can be used in stubbing mode more easily
 **/
 const getTranslationProps = (context, props) => {
-  const { i18n, routeUtils } = context();
+  const { i18n, manulRouter } = context();
   const locale = i18n.getLocale();
   const isEditor = i18n.isEditor();
   const translationId = getTranslationId(props);
   const translation = getTranslation(i18n, props);
   let editModeHighlighting = i18n.editModeHighlighting();
-  let gotoEdit = () => routeUtils.go(i18n.editRoute, { _id: translationId });
+  let gotoEdit = () => manulRouter.go(i18n.editRoute, { _id: translationId });
   if (props.doc) {
       // no edit mode highlighting for docs yet and no gotoEdit;
     gotoEdit = _.noop;
@@ -147,7 +147,7 @@ setComposerStub(T, (props) => {
       supportedLocales: ['de'],
       defaultLocale: 'de',
     }),
-    routeUtils: {
+    manulRouter: {
       go: _.noop,
     },
   });
