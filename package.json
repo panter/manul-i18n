@@ -1,7 +1,7 @@
 {
   "name": "@panter/manul-i18n",
   "description": "",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "author": {
     "name": "Marco Wettstein",
     "email": "maw@panter.ch",
@@ -40,7 +40,6 @@
     "lint": "eslint src/**.js"
   },
   "main": "./dist/manul-i18n.js",
-  "files": ["./dist/stores"],
   "dependencies": {
     "flat": "^2.0.1"
   }

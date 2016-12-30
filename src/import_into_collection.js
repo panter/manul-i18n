@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import flat from 'flat';
 
-
+/* eslint no-shadow: 0*/
 export default ({ override = false, translations, collection, locales = ['de', 'en', 'it', 'fr'] } = {}) => {
   const entries = new Map();
 
@@ -15,7 +15,7 @@ export default ({ override = false, translations, collection, locales = ['de', '
         if (!entries.has(key)) {
           entries.set(key, _.zipObject(
             _.map(locales, locale => valueKeyForLocale(locale)),
-            _.map(locales, locale => null)
+            _.map(locales, () => null),
           ));
         }
         entries.get(key)[valueKeyForLocale(locale)] = value;
@@ -24,6 +24,7 @@ export default ({ override = false, translations, collection, locales = ['de', '
   });
 
   console.log('--- importing i18n into collection --');
+  /* eslint no-restricted-syntax: 0*/
   for (const [key, value] of entries) {
     if (collection.findOne(key)) {
       if (override) {

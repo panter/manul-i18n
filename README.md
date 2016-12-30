@@ -294,7 +294,7 @@ import { Meteor } from 'meteor/meteor';
 //...
 import { ReactiveVar } from 'meteor/reactive-var';
 import { I18n } from '@panter/manul-i18n';
-import CollectionTranslationStore from '@panter/manul-i18n/stores/collection';
+import CollectionTranslationStore from '@panter/manul-i18n/dist/stores/collection';
 
 const translationStore = new CollectionTranslationStore({
   Meteor,
@@ -387,7 +387,7 @@ import { Meteor } from 'meteor/meteor';
 //...
 import UniverseI18n from 'meteor/universe:i18n';
 import { I18n } from '@panter/manul-i18n';
-import UniverseTranslationStore from '@panter/manul-i18n/stores/universe_i18n';
+import UniverseTranslationStore from '@panter/manul-i18n/dist/stores/universe_i18n';
 
 const translationStore = new UniverseTranslationStore({
   universeI18n: UniverseI18n,
