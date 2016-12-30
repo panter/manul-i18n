@@ -60,8 +60,8 @@ import _ from 'lodash';
   pass property disableEditorBypass to disable this feature on a <T>:
   <T disableEditorBypass>path.to.key</T>
 
-  if i18n-service provides a edit-route and i18n.editModeHighlighting() is true
-  a click on <T> will jump to this route.
+  if i18n-service provides a editTranslationAction and i18n.editModeHighlighting() is true
+  a click on <T> will call this function / mantra-action
 
   inspired by https://github.com/vazco/meteor-universe-i18n
   © Panter 2016
@@ -84,13 +84,22 @@ const getTranslation = (i18n, { doc, _id, disableEditorBypass, children, ...para
 this function is outside of the composer so that it can be used in stubbing mode more easily
 **/
 const getTranslationProps = (context, props) => {
-  const { i18n, manulRouter } = context();
+  const { i18n } = context();
   const locale = i18n.getLocale();
   const isEditor = i18n.isEditor();
   const translationId = getTranslationId(props);
   const translation = getTranslation(i18n, props);
+
   let editModeHighlighting = i18n.editModeHighlighting();
-  let gotoEdit = () => manulRouter.go(i18n.editRoute, { _id: translationId });
+  let gotoEdit = () => {
+    if (_.isFunction(i18n.editTranslationAction)) {
+      // call function
+      i18n.editTranslationAction(translationId);
+    } else if (_.isString(i18n.editTranslationAction)) {
+      // call mantra action
+      _.invoke(props.actions, i18n.editTranslationAction, translationId);
+    }
+  };
   if (props.doc) {
       // no edit mode highlighting for docs yet and no gotoEdit;
     gotoEdit = _.noop;
@@ -105,6 +114,7 @@ export const composer = ({ context, ...props }, onData) => {
 };
 export const depsMapper = (context, actions) => ({
   context: () => context,
+  actions,
 });
 
 const Component = ({ isEditor, editModeHighlighting, gotoEdit, locale, translationId, _tagType, _props = {}, translation, children }) => {
@@ -147,9 +157,6 @@ setComposerStub(T, (props) => {
       supportedLocales: ['de'],
       defaultLocale: 'de',
     }),
-    manulRouter: {
-      go: _.noop,
-    },
   });
   return getTranslationProps(stubContext, props);
 });

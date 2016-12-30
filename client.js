@@ -16,23 +16,26 @@ class I18nClient {
 
   constructor({
       SimpleSchema,
-      FlowRouter,
       translationStore,
       supportedLocales,
       defaultLocale = 'en',
       editModeHighlighting = () => false,
       shouldShowKeysAsFallback = () => false,
-      editRoute,
+      editTranslationAction = (translationId) => {
+        console.log('define editTranslationAction in I18nConstructor');
+        console.log('you can define a mantra-action (string)');
+        console.log('or you can define a function');
+        console.log(`would edit ${translationId}`);
+      },
       isEditor = () => false,
       options = DEFAULT_OPTIONS,
     }) {
-    this.FlowRouter = FlowRouter;
     this.SimpleSchema = SimpleSchema;
     this.translationStore = translationStore;
     this.editModeHighlighting = editModeHighlighting;
     this.shouldShowKeysAsFallback = shouldShowKeysAsFallback;
     this.isEditor = isEditor;
-    this.editRoute = editRoute;
+    this.editTranslationAction = editTranslationAction;
 
     this.supportedLocales = supportedLocales;
     this.defaultLocale = defaultLocale;
@@ -114,21 +117,6 @@ class I18nClient {
   }
   getLocale() {
     return this.translationStore.getLocale();
-  }
-
-  LocaleRoutes(baseRoutes = this.FlowRouter) {
-    const setLocaleByRoute = ({ params: { locale } }, redirect, stop) => {
-      if (this.supports(locale)) {
-        this.setLocale(locale);
-      } else {
-        this.FlowRouter.setParams({ locale: this.getFallbackLocale(locale) });
-        stop();
-      }
-    };
-    return baseRoutes.group({
-      prefix: '/:locale?',
-      triggersEnter: [setLocaleByRoute],
-    });
   }
 
   translateSchema(schema, namespace) {
