@@ -367,6 +367,7 @@ home:
 }
 ]
 
+```
 
 ### Setup with universe-i18n
 
