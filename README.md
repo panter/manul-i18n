@@ -129,7 +129,7 @@ You can pass property disableEditorBypass to disable this feature on a `<T>`:
 
 if i18n-service provides a `editTranslationAction` and i18n isEditMode() is true
 a click on `<T>` will call this function / mantra-action.
-This is handy if you want to allow page-editors to **edit translations directly in the browser** (e.g. with manul-admin **coming soon!**)
+This is handy if you want to allow page-editors to **edit translations directly in the browser** (e.g. with https://github.com/panter/manul-admin)
 
 If `editTranslationAction` is a string, it will invoke a (mantra-) action by this path
 and pass the id of the translation to the action. E.g.:
