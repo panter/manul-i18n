@@ -5,6 +5,8 @@ Inspired by https://github.com/vazco/meteor-universe-i18n
 
 `npm install --save @panter/manul-i18n`
 
+** Under development. Issues, Feedback and PR's very welcome!**
+
 ## Features
 
 - supports yaml-files (with https://github.com/vazco/meteor-universe-i18n) and collections as store for translations
