@@ -5,7 +5,7 @@ Inspired by https://github.com/vazco/meteor-universe-i18n
 
 `npm install --save @panter/manul-i18n`
 
-** Under development. Issues, Feedback and PR's very welcome!**
+**Under development. Issues, Feedback and PR's very welcome!**
 
 ## Features
 
@@ -129,7 +129,7 @@ You can pass property disableEditorBypass to disable this feature on a `<T>`:
 
 if i18n-service provides a `editTranslationAction` and i18n isEditMode() is true
 a click on `<T>` will call this function / mantra-action.
-This is handy if you want to allow page-editors to **edit translations directly in the browser**.
+This is handy if you want to allow page-editors to **edit translations directly in the browser** (e.g. with manul-admin **coming soon!**)
 
 If `editTranslationAction` is a string, it will invoke a (mantra-) action by this path
 and pass the id of the translation to the action. E.g.:
