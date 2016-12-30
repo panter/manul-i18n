@@ -153,7 +153,9 @@ It can also be a function. It then will be also called similar to the action
 ### Usage outside of react-components
 
 use `i18n.t` to translate. This is a reactive data-source, so it can be used in a
-Tracker.autorun-context like `createContainer` or in `composeWithTracker`
+Tracker.autorun-context like `createContainer` or in `composeWithTracker`.
+
+i18n is available in the mantra-context.
 
 ```
 const errorMessage = i18n.t("errors.login.failed");
