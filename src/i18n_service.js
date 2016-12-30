@@ -3,12 +3,9 @@ available in context as i18n.
 
 i18n.t(key, props): translate the given key (caution: only reactive in tracker-komposer)
 
-i18n.translateSchema(simpleSchema): adds translation to the simpleSchema
-
 **/
 import _ from 'lodash';
 
-import translateSimpleSchema from './translate_simple_schema';
 
 class I18nClient {
 
@@ -27,6 +24,7 @@ class I18nClient {
     // editTranslationAction will be called
     isEditMode = () => false,
     editTranslationAction = (translationId) => {
+      /* eslint no-console: 0*/
       console.log('define editTranslationAction in I18nConstructor');
       console.log('you can define a mantra-action (string)');
       console.log('or you can define a function');
@@ -36,9 +34,7 @@ class I18nClient {
     // if the translation is not available (can also be reactive datasource)
     // this is usefull for admins and/or in development-environement
     shouldShowKeysAsFallback = () => false,
-    SimpleSchema, // optional: allows to translate Schemas
     }) {
-    this.SimpleSchema = SimpleSchema;
     this.translationStore = translationStore;
     this.isEditMode = isEditMode;
     this.shouldShowKeysAsFallback = shouldShowKeysAsFallback;
@@ -123,12 +119,6 @@ class I18nClient {
   }
   getLocale() {
     return this.translationStore.getLocale();
-  }
-
-  translateSchema(schema, namespace) {
-    return translateSimpleSchema(
-      { i18n: this, SimpleSchema: this.SimpleSchema }, schema, namespace,
-    );
   }
 
   getSupportedLocales() {

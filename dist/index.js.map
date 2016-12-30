@@ -1,1 +1,0 @@
-{"version":3,"sources":["../src/index.js"],"names":[],"mappings":";;;;;;;;4BAAwB,gBAAgB","file":"index.js","sourcesContent":["import ManulRouter from './manul_router';\n\nexport default ManulRouter;\n"]}

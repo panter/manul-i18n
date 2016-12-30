@@ -1,8 +1,9 @@
-import { useDeps, composeAll, composeWithTracker, compose } from 'mantra-core';
-import { setComposerStub } from 'react-komposer';
-import I18nClient from '/manul-i18n/client';
 import React from 'react';
 import _ from 'lodash';
+import { useDeps, composeAll, composeWithTracker, compose } from 'mantra-core';
+import { setComposerStub } from 'react-komposer';
+import I18nClient from './manul-i18n';
+
 /**
 
                  MR T

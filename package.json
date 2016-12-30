@@ -13,9 +13,12 @@
     "url": "git://github.com/panter/manul-i18n.git"
   },
   "bugs": "https://github.com/panter/manul-i18n/issues",
-  "dependencies": {
-    "babel-runtime": "^5.8.25",
-    "lodash": "^4.17.3"
+  "peerDependencies": {
+    "babel-runtime": "*.*.*",
+    "lodash": "^4.0.0",
+    "mantra-core": "^1.7.0",
+    "react": "^15.0.0",
+    "react-komposer": "^1.0.0"
   },
   "devDependencies": {
     "babel": "^5.8.23",
@@ -36,5 +39,9 @@
     "compile": "npm run lint && babel src -s -d dist",
     "lint": "eslint src/**.js"
   },
-  "main": "./dist/manul-i18n.js"
+  "main": "./dist/manul-i18n.js",
+  "files": ["./dist/stores"],
+  "dependencies": {
+    "flat": "^2.0.1"
+  }
 }
