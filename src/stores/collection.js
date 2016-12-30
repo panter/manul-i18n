@@ -1,18 +1,21 @@
-import { Meteor } from 'meteor/meteor';
 import _ from 'lodash';
 import { unflatten } from 'flat';
 
 
 export default class {
   constructor({
-      collection,
-      publicationName = 'translations',
-      methodLogMissingKeyName = 'translations.logMissingKey',
-      } = {}) {
+    Meteor,
+    ReactiveVar, // only needed on client
+    collection,
+    publicationName = 'translations',
+    methodLogMissingKeyName = 'translations.logMissingKey',
+    } = {}) {
     this.methodLogMissingKeyName = methodLogMissingKeyName;
     this.publicationName = publicationName;
 
     this.collection = collection;
+    this.Meteor = Meteor;
+    this.ReactiveVar = ReactiveVar;
     if (Meteor.isClient) {
       this.initClient();
     } else {
@@ -21,32 +24,30 @@ export default class {
   }
 
   initClient() {
-    const ReactiveVar = require('meteor/reactive-var').ReactiveVar;
-
-    this.locale = new ReactiveVar();
-    this.subscription = Meteor.subscribe(this.publicationName);
+    this.locale = new this.ReactiveVar();
+    this.subscription = this.Meteor.subscribe(this.publicationName);
   }
 
   initServer() {
-    Meteor.publish(this.publicationName, () =>
-       this.collection.find({})
+    this.Meteor.publish(this.publicationName, () =>
+       this.collection.find({}),
     );
   }
 
   getLocale() {
-    if (Meteor.isServer) {
-      throw new Meteor.Error('getLocale can only be called on the client');
+    if (this.Meteor.isServer) {
+      throw new this.Meteor.Error('getLocale can only be called on the client');
     }
     return this.locale.get();
   }
 
   setLocale(locale) {
-    if (Meteor.isServer) {
-      throw new Meteor.Error('setLocale can only be called on the client');
+    if (this.Meteor.isServer) {
+      throw new this.Meteor.Error('setLocale can only be called on the client');
     }
     return this.locale.set(locale);
   }
-
+  /* eslint class-methods-use-this: 0*/
   getValueKey(locale) {
     return `value_${locale}`;
   }
