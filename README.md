@@ -227,7 +227,7 @@ export default composeAll(
 
 
 import React from 'react';
-import AutoForm from '/AutoForm';
+import AutoForm from 'uniforms/AutoForm';
 
 export default ({loginSchema, login}) => (
   <AutoForm schema={loginSchema} onSubmit={login} />  
