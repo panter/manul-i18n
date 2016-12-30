@@ -437,3 +437,56 @@ const i18n = new I18n({
 
 
 ```
+
+
+### Import yaml-translations into a collection.
+
+This package also provides a function to import translations from an object
+into a collection, e.g. to migrate from yaml to collection-store:
+
+```
+
+importIntoCollection({
+  translations, // the translation object, e.g. loaded from a yaml file
+  collection, // the collection to import into
+  locales: // the locales that should be imported
+  override: false, // wheter or not to override already existing keys.
+});
+
+```
+
+### Seed translations
+
+**It is highly recomended to seed translations initially!**
+
+Here is an example how you could do this (on the server):
+
+```
+
+import { Meteor } from 'meteor/meteor';
+
+import YAML from 'yamljs';
+import importIntoCollection from '@panter/manul-i18n/dist/import_into_collection';
+import { Translations } from '/lib/collections';
+
+export default () => {
+  Meteor.startup(() => {
+    const localesToSeed = ['de'];
+    const translations = {};
+    const translationsForLocale = (locale) => {
+      const translation = YAML.parse(Assets.getText(`i18n-seed/${locale}.yaml`));
+      translations[locale] = translation;
+    };
+
+    localesToSeed.forEach(translationsForLocale);
+
+    importIntoCollection({
+      translations,
+      collection: Translations,
+      locales: localesToSeed,
+      override: false,
+    });
+  });
+};
+
+```
