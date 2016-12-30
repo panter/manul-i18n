@@ -9,7 +9,7 @@ Inspired by https://github.com/vazco/meteor-universe-i18n
 
 ## Features
 
-- supports yaml-files (with https://github.com/vazco/meteor-universe-i18n) and collections as store for translations
+- supports meteor-collections as store for translations or yaml-files (with https://github.com/vazco/meteor-universe-i18n)
 - provides `<T>`-Component for easy translations (we call it "Mr. T")
 - you can manually translate strings with
 - you can translate SimpleSchemas in a hoc. This comes handy with `<AutoForm>` from https://github.com/vazco/uniforms/
