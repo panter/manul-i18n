@@ -54,13 +54,13 @@ import _ from 'lodash';
   Advanced:
   ---------
 
-  If i18n.editModeHighlighting() returns true (reactivly),
+  If i18n isEditMode() returns true (reactivly),
   it will render the key instead of the translation (does not work for doc-paths currently).
 
   pass property disableEditorBypass to disable this feature on a <T>:
   <T disableEditorBypass>path.to.key</T>
 
-  if i18n-service provides a editTranslationAction and i18n.editModeHighlighting() is true
+  if i18n-service provides a editTranslationAction and i18n isEditMode() is true
   a click on <T> will call this function / mantra-action
 
   inspired by https://github.com/vazco/meteor-universe-i18n
@@ -86,11 +86,10 @@ this function is outside of the composer so that it can be used in stubbing mode
 const getTranslationProps = (context, props) => {
   const { i18n } = context();
   const locale = i18n.getLocale();
-  const isEditor = i18n.isEditor();
   const translationId = getTranslationId(props);
   const translation = getTranslation(i18n, props);
 
-  let editModeHighlighting = i18n.editModeHighlighting();
+  let isEditMode = i18n.isEditMode();
   let gotoEdit = () => {
     if (_.isFunction(i18n.editTranslationAction)) {
       // call function
@@ -103,9 +102,9 @@ const getTranslationProps = (context, props) => {
   if (props.doc) {
       // no edit mode highlighting for docs yet and no gotoEdit;
     gotoEdit = _.noop;
-    editModeHighlighting = false;
+    isEditMode = false;
   }
-  return { translationId, gotoEdit, translation, locale, isEditor, editModeHighlighting };
+  return { translationId, gotoEdit, translation, locale, isEditMode };
 };
 
 
@@ -117,34 +116,38 @@ export const depsMapper = (context, actions) => ({
   actions,
 });
 
-const Component = ({ isEditor, editModeHighlighting, gotoEdit, locale, translationId, _tagType, _props = {}, translation, children }) => {
-  const editorProps = {};
+const Component = (
+  { isEditMode, gotoEdit, locale, _tagType, _props = {}, translation, children },
+) => {
   if (_.isFunction(children)) {
     return children(translation);
   }
-  if (isEditor) {
-    editorProps.title = translationId;
-    editorProps.style = { cursor: editModeHighlighting ? 'pointer' : null, textTransform: editModeHighlighting && 'none' };
-    editorProps.onClick = () => (editModeHighlighting && gotoEdit ? gotoEdit() : null);
-  }
+  const editorProps = {
+    style: {
+      cursor: isEditMode && 'pointer',
+      textTransform: isEditMode && 'none',
+    },
+    onClick: () => (isEditMode && gotoEdit ? gotoEdit() : null),
+  };
   return React.createElement(_tagType || 'span', {
     ..._props,
     ...editorProps,
     dangerouslySetInnerHTML: {
       __html: translation,
-    }, key: locale,
+    },
+    key: locale,
   });
 };
-
 
 Component.displayName = 'T';
 
 const composeWithTrackerServerSave = _.get(global, 'Meteor.isServer') ? compose : composeWithTracker;
 const T = composeAll(
   composeWithTrackerServerSave(composer),
-  useDeps(depsMapper)
+  useDeps(depsMapper),
 )(Component);
 
+T.displayName = 'T';
 
 setComposerStub(T, (props) => {
   const stubContext = () => ({
@@ -160,6 +163,5 @@ setComposerStub(T, (props) => {
   });
   return getTranslationProps(stubContext, props);
 });
-
 
 export default T;
