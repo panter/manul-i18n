@@ -11,7 +11,7 @@ export default ({ i18n, SimpleSchema }) => (schema, namespace) => {
   const _addSubSchemaTranslations = (parentFieldFullName = null, parentTranslation = {}) => {
     schema.objectKeys(parentFieldFullName).forEach((field) => {
       const fullFieldName = parentFieldFullName ? `${parentFieldFullName}.${field}` : field;
-      const fieldTranslation = parentTranslation[field];
+      const fieldTranslation = _.get(parentTranslation, field);
       const fieldDefinition = schema.getDefinition(fullFieldName);
       const defaultTransform = value => (fieldTranslation && fieldTranslation[value]) || value;
       let label = null;
