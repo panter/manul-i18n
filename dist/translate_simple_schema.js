@@ -32,7 +32,7 @@ exports['default'] = function (_ref) {
 
       schema.objectKeys(parentFieldFullName).forEach(function (field) {
         var fullFieldName = parentFieldFullName ? parentFieldFullName + '.' + field : field;
-        var fieldTranslation = parentTranslation[field];
+        var fieldTranslation = _lodash2['default'].get(parentTranslation, field);
         var fieldDefinition = schema.getDefinition(fullFieldName);
         var defaultTransform = function defaultTransform(value) {
           return fieldTranslation && fieldTranslation[value] || value;

@@ -52,26 +52,20 @@ export default class {
     return `value_${locale}`;
   }
 
-  translate(keyOrNamespace, { _locale = this.getLocale(), ...params } = {}) {
+  translate(keyOrNamespace, options = {}) {
+    const { _locale = this.getLocale(), ...params } = options;
     if (!keyOrNamespace) {
       return '';
     }
 
     const results = this.findResultsForKey(keyOrNamespace);
 
-    const open = '{$';
-    const close = '}';
-
-    const getValue = (entry, locale) => {
-      if (_.has(entry, this.getValueKey(locale))) {
-        let value = entry[this.getValueKey(locale)];
-
-        Object.keys(params).forEach((param) => {
-          const substitution = _.get(params, param, '');
-          value = value.split(open + param + close).join(substitution);
-        });
-
-        return value;
+    const getValue = (entry) => {
+      if (_.has(entry, this.getValueKey(_locale))) {
+        return this._replaceParamsInString(
+            _.get(entry, this.getValueKey(_locale)),
+          params,
+        );
       }
       return null;
     };
@@ -79,7 +73,7 @@ export default class {
          _.chain(results)
          .sortBy(({ _id }) => _id.length)
          .keyBy('_id')
-         .mapValues(entry => getValue(entry, _locale))
+         .mapValues(getValue)
          .value(),
        { overwrite: true });
     const objectOrString = _.get(object, keyOrNamespace);
@@ -98,6 +92,17 @@ export default class {
       return this.collection.find({ _id: { $regex: `${keyOrNamespace}/*` } }).fetch();
     }
     return [result];
+  }
+
+  _replaceParamsInString(string, params) {
+    const open = '{$';
+    const close = '}';
+    let replacedString = string;
+    Object.keys(params).forEach((param) => {
+      const substitution = _.get(params, param, '');
+      replacedString = replacedString.split(open + param + close).join(substitution);
+    });
+    return replacedString;
   }
 
 

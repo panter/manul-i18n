@@ -9,7 +9,7 @@ Object.defineProperty(exports, '__esModule', {
 exports['default'] = evalSimpleSchemaRegexKeys;
 
 function evalSimpleSchemaRegexKeys(messages) {
-  if (messages.regEx) {
+  if (messages && messages.regEx) {
     var regEx = messages.regEx.map(function (_ref) {
       var msg = _ref.msg;
       var exp = _ref.exp;

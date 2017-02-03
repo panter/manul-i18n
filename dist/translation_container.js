@@ -22,9 +22,9 @@ var _mantraCore = require('mantra-core');
 
 var _reactKomposer = require('react-komposer');
 
-var _manulI18n = require('./manul-i18n');
+var _i18n_service = require('./i18n_service');
 
-var _manulI18n2 = _interopRequireDefault(_manulI18n);
+var _i18n_service2 = _interopRequireDefault(_i18n_service);
 
 /**
 
@@ -202,7 +202,7 @@ T.displayName = 'T';
 (0, _reactKomposer.setComposerStub)(T, function (props) {
   var stubContext = function stubContext() {
     return {
-      i18n: new _manulI18n2['default']({
+      i18n: new _i18n_service2['default']({
         translationStore: {
           setLocale: _lodash2['default'].noop,
           getLocale: function getLocale() {

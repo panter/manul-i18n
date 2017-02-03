@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { useDeps, composeAll, composeWithTracker, compose } from 'mantra-core';
 import { setComposerStub } from 'react-komposer';
-import I18nClient from './manul-i18n';
+import I18nService from './i18n_service';
 
 /**
 
@@ -152,7 +152,7 @@ T.displayName = 'T';
 
 setComposerStub(T, (props) => {
   const stubContext = () => ({
-    i18n: new I18nClient({
+    i18n: new I18nService({
       translationStore: {
         setLocale: _.noop,
         getLocale: () => 'de',

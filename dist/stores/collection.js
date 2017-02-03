@@ -91,13 +91,12 @@ var _default = (function () {
     value: function translate(keyOrNamespace) {
       var _this2 = this;
 
-      var _ref2 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var _options$_locale = options._locale;
 
-      var _ref2$_locale = _ref2._locale;
+      var _locale = _options$_locale === undefined ? this.getLocale() : _options$_locale;
 
-      var _locale = _ref2$_locale === undefined ? this.getLocale() : _ref2$_locale;
-
-      var params = _objectWithoutProperties(_ref2, ['_locale']);
+      var params = _objectWithoutProperties(options, ['_locale']);
 
       if (!keyOrNamespace) {
         return '';
@@ -105,34 +104,16 @@ var _default = (function () {
 
       var results = this.findResultsForKey(keyOrNamespace);
 
-      var open = '{$';
-      var close = '}';
-
-      var getValue = function getValue(entry, locale) {
-        if (_lodash2['default'].has(entry, _this2.getValueKey(locale))) {
-          var _ret = (function () {
-            var value = entry[_this2.getValueKey(locale)];
-
-            _Object$keys(params).forEach(function (param) {
-              var substitution = _lodash2['default'].get(params, param, '');
-              value = value.split(open + param + close).join(substitution);
-            });
-
-            return {
-              v: value
-            };
-          })();
-
-          if (typeof _ret === 'object') return _ret.v;
+      var getValue = function getValue(entry) {
+        if (_lodash2['default'].has(entry, _this2.getValueKey(_locale))) {
+          return _this2._replaceParamsInString(_lodash2['default'].get(entry, _this2.getValueKey(_locale)), params);
         }
         return null;
       };
-      var object = (0, _flat.unflatten)(_lodash2['default'].chain(results).sortBy(function (_ref3) {
-        var _id = _ref3._id;
+      var object = (0, _flat.unflatten)(_lodash2['default'].chain(results).sortBy(function (_ref2) {
+        var _id = _ref2._id;
         return _id.length;
-      }).keyBy('_id').mapValues(function (entry) {
-        return getValue(entry, _locale);
-      }).value(), { overwrite: true });
+      }).keyBy('_id').mapValues(getValue).value(), { overwrite: true });
       var objectOrString = _lodash2['default'].get(object, keyOrNamespace);
       if (!_lodash2['default'].isString(objectOrString) && _lodash2['default'].isEmpty(objectOrString)) {
         // empty object or undefined
@@ -150,6 +131,18 @@ var _default = (function () {
         return this.collection.find({ _id: { $regex: keyOrNamespace + '/*' } }).fetch();
       }
       return [result];
+    }
+  }, {
+    key: '_replaceParamsInString',
+    value: function _replaceParamsInString(string, params) {
+      var open = '{$';
+      var close = '}';
+      var replacedString = string;
+      _Object$keys(params).forEach(function (param) {
+        var substitution = _lodash2['default'].get(params, param, '');
+        replacedString = replacedString.split(open + param + close).join(substitution);
+      });
+      return replacedString;
     }
   }]);
 
