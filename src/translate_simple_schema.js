@@ -1,62 +1,51 @@
 import _ from 'lodash';
 import evalSimpleSchemaRegexKeys from './eval_simpleschema_regex_keys';
 
-export default ({ i18n, SimpleSchema }) => (schema, namespace) => {
+export default ({ i18n, SimpleSchema }) => (schemaOrg, namespace) => {
   if (!SimpleSchema) {
     throw new Error('please provide SimpleSchema if you want to translate schemas');
   }
+  // clone the schema
+  const schema = _.cloneDeep(schemaOrg);
   // translate all the labels
   const translations = i18n.t(namespace);
-  const translatedDef = {};
-  const _addSubSchemaTranslations = (parentFieldFullName = null, parentTranslation = {}) => {
+
+  const _translateSchemaObject = (parentFieldFullName = null, parentTranslation = {}) => {
     schema.objectKeys(parentFieldFullName).forEach((field) => {
       const fullFieldName = parentFieldFullName ? `${parentFieldFullName}.${field}` : field;
-      const fieldTranslation = _.get(parentTranslation, field);
-      const fieldDefinition = schema.getDefinition(fullFieldName);
-      const defaultTransform = value => (fieldTranslation && fieldTranslation[value]) || value;
+      const fieldTranslations = _.get(parentTranslation, field);
       let label = null;
-      let hintText = null;
-      let hintTitle = null;
-      let listAdd = null;
-      let listDel = null;
-      let toggleOptionalLabel = null;
-      if (fieldTranslation) {
-        if (_.isString(fieldTranslation)) {
-          label = fieldTranslation;
+      if (fieldTranslations) {
+        if (_.isString(fieldTranslations)) {
+          label = fieldTranslations;
         } else {
-          label = fieldTranslation.label;
-          hintText = fieldTranslation.hintText;
-          hintTitle = fieldTranslation.hintTitle;
-          toggleOptionalLabel = fieldTranslation.toggleOptionalLabel;
-          listAdd = fieldTranslation.listAdd;
-          listDel = fieldTranslation.listDel;
+          label = fieldTranslations.label;
         }
       }
-      // recursivly add subfields as well, but flat
-      if (schema.objectKeys(fullFieldName).length > 0) {
-        _addSubSchemaTranslations(fullFieldName, fieldTranslation);
-      }
-      translatedDef[fullFieldName] = {
+      const defaultTransform = value => _.get(fieldTranslations, value, value);
+      // we mutate now the schema
+      const fieldSchema = schema.schema(fullFieldName);
+      _.extend(fieldSchema, {
         label: label || `${namespace}.${fullFieldName}`,
         uniforms: {
           transform: defaultTransform,
-          hintText,
-          hintTitle,
-          listAdd,
-          listDel,
-          toggleOptionalLabel,
-          ...fieldDefinition.uniforms, // can override default transform
+          translations: fieldTranslations,
+          ...schemaOrg.getDefinition(fullFieldName).uniforms, // can override default transform
         },
-      };
+      });
+      // recursivly translate subobjects and subschemas
+      if (schema.objectKeys(fullFieldName).length > 0) {
+        _translateSchemaObject(fullFieldName, fieldTranslations);
+      }
     });
   };
+  _translateSchemaObject(null, translations);
 
-  _addSubSchemaTranslations(null, translations);
-  const translatedScheme = new SimpleSchema([schema, translatedDef]);
-  const simpleSchemaMessages = evalSimpleSchemaRegexKeys(
-    i18n.t('simpleSchema'),
-  );
-  translatedScheme.messages(simpleSchemaMessages);
+  // we do not use the locale feature of simpleschema (yet),
+  // instead we just add the right translations
+  // to the default locale (en) in messagebox
+  schema.messageBox.messages({ en: evalSimpleSchemaRegexKeys(i18n.t('simpleSchema')) });
 
-  return translatedScheme;
+
+  return schema;
 };

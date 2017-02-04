@@ -36,11 +36,21 @@ var composer = function composer(mappingArrayOrFunction) {
     var _context = context();
 
     var i18n = _context.i18n;
-    var SimpleSchema = _context.SimpleSchema;
 
-    if (!SimpleSchema) {
-      throw new Error('If you want to use withTranslatedSchema, you have to provide SimpleSchema in your context');
+    var SimpleSchema = undefined;
+    try {
+      // try load simpleSchema form npm
+      /* eslint global-require: 0 */
+      /* eslint import/no-unresolved: 0 */
+      SimpleSchema = require('simpl-schema')['default'];
+    } catch (e) {
+      // load from context
+      SimpleSchema = context().SimpleSchema;
     }
+    if (!SimpleSchema) {
+      throw new Error('Please provice SimpleSchema as npm module (recomended) or in context to use withTranslatedSchema');
+    }
+
     var mapping = mappingArrayOrFunction;
     if (_lodash2['default'].isFunction(mappingArrayOrFunction)) {
       mapping = mappingArrayOrFunction(_extends({ context: context }, props));
