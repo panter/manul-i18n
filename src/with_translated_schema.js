@@ -10,10 +10,22 @@ import translateSimpleSchema from './translate_simple_schema';
   e.g. withTranslatedSchema({companySchema: "companies"})
 */
 export const composer = mappingArrayOrFunction => ({ context, ...props }, onData) => {
-  const { i18n, SimpleSchema } = context();
-  if (!SimpleSchema) {
-    throw new Error('If you want to use withTranslatedSchema, you have to provide SimpleSchema in your context');
+  const { i18n } = context();
+
+  let SimpleSchema;
+  try {
+    // try load simpleSchema form npm
+    /* eslint global-require: 0 */
+    /* eslint import/no-unresolved: 0 */
+    SimpleSchema = require('simpl-schema').default;
+  } catch (e) {
+  // load from context
+    SimpleSchema = context().SimpleSchema;
   }
+  if (!SimpleSchema) {
+    throw new Error('Please provice SimpleSchema as npm module (recomended) or in context to use withTranslatedSchema');
+  }
+
   let mapping = mappingArrayOrFunction;
   if (_.isFunction(mappingArrayOrFunction)) {
     mapping = mappingArrayOrFunction({ context, ...props });
