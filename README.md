@@ -287,6 +287,11 @@ withTranslatedSchema({registerSchema: "register"})
 
 ### With Collection-Store
 
+
+
+
+#### Client
+
 You should provide the service in your mantra context.js.
 Here is an example configuration with the collection store:
 
@@ -373,6 +378,35 @@ home:
 
 ```
 
+#### Server
+
+On the server you need to create a new translation store as well and pass your collection. This will start the publication:
+
+```
+import TranslationStore from '@panter/manul-i18n/dist/stores/collection';
+import { Translations } from '/lib/collections';
+import { Meteor } from 'meteor/meteor';
+
+const translationStore = new TranslationStore({
+  Meteor,
+  collection: Translations,
+});
+```
+
+you don't need to use the `translationStore` variable, but you can use it to create a simple server-side translation
+service (e.g. to translate emails), which is not yet supported by manul-i18n:
+
+```
+// on server, you always need to specify a locale
+// that's why we do not name it t, so that one does not confuse it
+/* eslint import/prefer-default-export: 0*/
+export const translate = (locale, keyOrNamespace, params) => (
+  translationStore.translate(keyOrNamespace, { _locale: locale, ...params })
+);
+
+```
+
+
 ### Setup with universe-i18n
 
 universe-i18n (https://github.com/vazco/meteor-universe-i18n)
@@ -404,6 +438,8 @@ const i18n = new I18n({
 //...
 
 ```
+
+There is no server-initialization needed
 
 
 ### Advanced configuration

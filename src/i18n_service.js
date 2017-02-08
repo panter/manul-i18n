@@ -46,7 +46,9 @@ class I18nClient {
     this.setLocale(defaultLocale);
   }
 
-  t(keyOrNamespace, props, { disableEditorBypass = false } = {}) {
+  t(keyOrNamespace, props,
+    { useFallbackForMissing = false, showKeyForMissing = false, disableEditorBypass = false } = {},
+  ) {
     if (!keyOrNamespace) {
       return '! no translationId given !';
     }
@@ -58,7 +60,10 @@ class I18nClient {
       return translation;
     }
     const fallbackLocale = this.getFallbackLocale();
-    if (this.useFallbackForMissing && this.getLocale() !== fallbackLocale) {
+    if (
+      (useFallbackForMissing || this.useFallbackForMissing) &&
+      this.getLocale() !== fallbackLocale
+    ) {
       translation = this.translationStore.translate(
           keyOrNamespace, { ...props, _locale: fallbackLocale },
         );
@@ -66,7 +71,7 @@ class I18nClient {
       // if still nil and is editor, return key if allowed
     if (!_.isNil(translation)) {
       return translation;
-    } else if (this.shouldShowKeysAsFallback()) {
+    } else if (showKeyForMissing || this.shouldShowKeysAsFallback()) {
       return keyOrNamespace;
     }
     return null; // we tried :-(

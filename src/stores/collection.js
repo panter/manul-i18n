@@ -8,11 +8,8 @@ export default class {
     ReactiveVar, // only needed on client
     collection,
     publicationName = 'translations',
-    methodLogMissingKeyName = 'translations.logMissingKey',
     } = {}) {
-    this.methodLogMissingKeyName = methodLogMissingKeyName;
     this.publicationName = publicationName;
-
     this.collection = collection;
     this.Meteor = Meteor;
     this.ReactiveVar = ReactiveVar;
@@ -25,12 +22,17 @@ export default class {
 
   initClient() {
     this.locale = new this.ReactiveVar();
-    this.subscription = this.Meteor.subscribe(this.publicationName);
+    this.startSubscription(this.getLocale());
+  }
+
+  startSubscription(locale) {
+    // we keep all old subscription, so no stop or tracker here
+    this.Meteor.subscribe(this.publicationName, locale);
   }
 
   initServer() {
-    this.Meteor.publish(this.publicationName, () =>
-       this.collection.find({}),
+    this.Meteor.publish(this.publicationName, locale =>
+       this.collection.find({}, { fields: { [this.getValueKey(locale)]: true } }),
     );
   }
 
@@ -45,7 +47,8 @@ export default class {
     if (this.Meteor.isServer) {
       throw new this.Meteor.Error('setLocale can only be called on the client');
     }
-    return this.locale.set(locale);
+    this.locale.set(locale);
+    this.startSubscription(locale); // restart
   }
   /* eslint class-methods-use-this: 0*/
   getValueKey(locale) {
@@ -54,6 +57,11 @@ export default class {
 
   translate(keyOrNamespace, options = {}) {
     const { _locale = this.getLocale(), ...params } = options;
+    // if locale is different (e.g. fallback), subscribe to that locale as well
+    // so that it will be available soon
+    if (_locale !== this.getLocale()) {
+      this.startSubscription(_locale);
+    }
     if (!keyOrNamespace) {
       return '';
     }

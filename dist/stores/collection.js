@@ -4,6 +4,8 @@ var _createClass = require('babel-runtime/helpers/create-class')['default'];
 
 var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
 
+var _defineProperty = require('babel-runtime/helpers/define-property')['default'];
+
 var _objectWithoutProperties = require('babel-runtime/helpers/object-without-properties')['default'];
 
 var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
@@ -30,14 +32,10 @@ var _default = (function () {
     collection = _ref.collection;
     var _ref$publicationName = _ref.publicationName;
     var publicationName = _ref$publicationName === undefined ? 'translations' : _ref$publicationName;
-    var _ref$methodLogMissingKeyName = _ref.methodLogMissingKeyName;
-    var methodLogMissingKeyName = _ref$methodLogMissingKeyName === undefined ? 'translations.logMissingKey' : _ref$methodLogMissingKeyName;
 
     _classCallCheck(this, _default);
 
-    this.methodLogMissingKeyName = methodLogMissingKeyName;
     this.publicationName = publicationName;
-
     this.collection = collection;
     this.Meteor = Meteor;
     this.ReactiveVar = ReactiveVar;
@@ -52,15 +50,21 @@ var _default = (function () {
     key: 'initClient',
     value: function initClient() {
       this.locale = new this.ReactiveVar();
-      this.subscription = this.Meteor.subscribe(this.publicationName);
+      this.startSubscription(this.getLocale());
+    }
+  }, {
+    key: 'startSubscription',
+    value: function startSubscription(locale) {
+      // we keep all old subscription, so no stop or tracker here
+      this.Meteor.subscribe(this.publicationName, locale);
     }
   }, {
     key: 'initServer',
     value: function initServer() {
       var _this = this;
 
-      this.Meteor.publish(this.publicationName, function () {
-        return _this.collection.find({});
+      this.Meteor.publish(this.publicationName, function (locale) {
+        return _this.collection.find({}, { fields: _defineProperty({}, _this.getValueKey(locale), true) });
       });
     }
   }, {
@@ -77,7 +81,8 @@ var _default = (function () {
       if (this.Meteor.isServer) {
         throw new this.Meteor.Error('setLocale can only be called on the client');
       }
-      return this.locale.set(locale);
+      this.locale.set(locale);
+      this.startSubscription(locale); // restart
     }
 
     /* eslint class-methods-use-this: 0*/
@@ -98,6 +103,11 @@ var _default = (function () {
 
       var params = _objectWithoutProperties(options, ['_locale']);
 
+      // if locale is different (e.g. fallback), subscribe to that locale as well
+      // so that it will be available soon
+      if (_locale !== this.getLocale()) {
+        this.startSubscription(_locale);
+      }
       if (!keyOrNamespace) {
         return '';
       }

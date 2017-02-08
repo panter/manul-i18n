@@ -83,6 +83,10 @@ var I18nClient = (function () {
     value: function t(keyOrNamespace, props) {
       var _ref2 = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
+      var _ref2$useFallbackForMissing = _ref2.useFallbackForMissing;
+      var useFallbackForMissing = _ref2$useFallbackForMissing === undefined ? false : _ref2$useFallbackForMissing;
+      var _ref2$showKeyForMissing = _ref2.showKeyForMissing;
+      var showKeyForMissing = _ref2$showKeyForMissing === undefined ? false : _ref2$showKeyForMissing;
       var _ref2$disableEditorBypass = _ref2.disableEditorBypass;
       var disableEditorBypass = _ref2$disableEditorBypass === undefined ? false : _ref2$disableEditorBypass;
 
@@ -97,13 +101,13 @@ var I18nClient = (function () {
         return translation;
       }
       var fallbackLocale = this.getFallbackLocale();
-      if (this.useFallbackForMissing && this.getLocale() !== fallbackLocale) {
+      if ((useFallbackForMissing || this.useFallbackForMissing) && this.getLocale() !== fallbackLocale) {
         translation = this.translationStore.translate(keyOrNamespace, _extends({}, props, { _locale: fallbackLocale }));
       }
       // if still nil and is editor, return key if allowed
       if (!_lodash2['default'].isNil(translation)) {
         return translation;
-      } else if (this.shouldShowKeysAsFallback()) {
+      } else if (showKeyForMissing || this.shouldShowKeysAsFallback()) {
         return keyOrNamespace;
       }
       return null; // we tried :-(
