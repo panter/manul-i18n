@@ -45,12 +45,37 @@ class I18nClient {
     this.changeCallbacks = [];
     this.setLocale(defaultLocale);
   }
+  /**
 
-  t(keyOrNamespace, props,
-    { useFallbackForMissing = false, showKeyForMissing = false, disableEditorBypass = false } = {},
+    NEW: if param is an array, it will return the first that exists (in any language)
+    if no key is found, it uses the last key.
+    This is usuefull if you create keys programatically (e.g. by error codes)
+    or by convention and have a certain fallback strategy
+  **/
+  t(keyOrArrayOfKeys, ...args) {
+    let key;
+    if (_.isArray(keyOrArrayOfKeys)) {
+      key = _.find(keyOrArrayOfKeys, k => this.has(k));
+      if (_.isNil(key)) {
+        key = _.last(keyOrArrayOfKeys);
+      }
+    } else {
+      key = keyOrArrayOfKeys;
+    }
+
+    return this.tKey(key, ...args);
+  }
+
+  tKey(keyOrNamespace, props,
+    {
+      useFallbackForMissing = false,
+      showKeyForMissing = false,
+      disableEditorBypass = false,
+      nullKeyValue = '! no translationId given !',
+     } = {},
   ) {
     if (!keyOrNamespace) {
-      return '! no translationId given !';
+      return nullKeyValue;
     }
     if (!disableEditorBypass && this.isEditMode()) {
       return keyOrNamespace;
@@ -75,6 +100,14 @@ class I18nClient {
       return keyOrNamespace;
     }
     return null; // we tried :-(
+  }
+
+  has(keyOrNamespace) {
+    return this.translationStore.has(keyOrNamespace);
+  }
+
+  hasObject(keyOrNamespace) {
+    return this.translationStore.hasObject(keyOrNamespace);
   }
 
   /**

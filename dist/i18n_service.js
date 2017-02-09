@@ -78,9 +78,39 @@ var I18nClient = (function () {
     this.setLocale(defaultLocale);
   }
 
+  /**
+     NEW: if param is an array, it will return the first that exists (in any language)
+    if no key is found, it uses the last key.
+    This is usuefull if you create keys programatically (e.g. by error codes)
+    or by convention and have a certain fallback strategy
+  **/
+
   _createClass(I18nClient, [{
     key: 't',
-    value: function t(keyOrNamespace, props) {
+    value: function t(keyOrArrayOfKeys) {
+      var _this = this;
+
+      var key = undefined;
+      if (_lodash2['default'].isArray(keyOrArrayOfKeys)) {
+        key = _lodash2['default'].find(keyOrArrayOfKeys, function (k) {
+          return _this.has(k);
+        });
+        if (_lodash2['default'].isNil(key)) {
+          key = _lodash2['default'].last(keyOrArrayOfKeys);
+        }
+      } else {
+        key = keyOrArrayOfKeys;
+      }
+
+      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      return this.tKey.apply(this, [key].concat(args));
+    }
+  }, {
+    key: 'tKey',
+    value: function tKey(keyOrNamespace, props) {
       var _ref2 = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
       var _ref2$useFallbackForMissing = _ref2.useFallbackForMissing;
@@ -89,9 +119,11 @@ var I18nClient = (function () {
       var showKeyForMissing = _ref2$showKeyForMissing === undefined ? false : _ref2$showKeyForMissing;
       var _ref2$disableEditorBypass = _ref2.disableEditorBypass;
       var disableEditorBypass = _ref2$disableEditorBypass === undefined ? false : _ref2$disableEditorBypass;
+      var _ref2$nullKeyValue = _ref2.nullKeyValue;
+      var nullKeyValue = _ref2$nullKeyValue === undefined ? '! no translationId given !' : _ref2$nullKeyValue;
 
       if (!keyOrNamespace) {
-        return '! no translationId given !';
+        return nullKeyValue;
       }
       if (!disableEditorBypass && this.isEditMode()) {
         return keyOrNamespace;
@@ -111,6 +143,16 @@ var I18nClient = (function () {
         return keyOrNamespace;
       }
       return null; // we tried :-(
+    }
+  }, {
+    key: 'has',
+    value: function has(keyOrNamespace) {
+      return this.translationStore.has(keyOrNamespace);
+    }
+  }, {
+    key: 'hasObject',
+    value: function hasObject(keyOrNamespace) {
+      return this.translationStore.hasObject(keyOrNamespace);
     }
 
     /**

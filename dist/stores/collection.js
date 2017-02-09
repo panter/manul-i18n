@@ -22,6 +22,8 @@ var _lodash2 = _interopRequireDefault(_lodash);
 
 var _flat = require('flat');
 
+var _flat2 = _interopRequireDefault(_flat);
+
 var _default = (function () {
   function _default() {
     var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -132,6 +134,16 @@ var _default = (function () {
       return objectOrString;
     }
   }, {
+    key: 'has',
+    value: function has(keyOrNamespace) {
+      return this.collection.findOne(keyOrNamespace);
+    }
+  }, {
+    key: 'hasObject',
+    value: function hasObject(keyOrNamespace) {
+      return this.findResultsForKey(keyOrNamespace).length > 1;
+    }
+  }, {
     key: 'findResultsForKey',
     value: function findResultsForKey(keyOrNamespace) {
       var result = this.collection.findOne(keyOrNamespace);
@@ -144,7 +156,9 @@ var _default = (function () {
     }
   }, {
     key: '_replaceParamsInString',
-    value: function _replaceParamsInString(string, params) {
+    value: function _replaceParamsInString(string, paramsUnflatted) {
+      // flat params if not flat
+      var params = (0, _flat2['default'])(paramsUnflatted);
       var open = '{$';
       var close = '}';
       var replacedString = string;

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { unflatten } from 'flat';
+import flat, { unflatten } from 'flat';
 
 
 export default class {
@@ -92,6 +92,13 @@ export default class {
     return objectOrString;
   }
 
+  has(keyOrNamespace) {
+    return this.collection.findOne(keyOrNamespace);
+  }
+  hasObject(keyOrNamespace) {
+    return this.findResultsForKey(keyOrNamespace).length > 1;
+  }
+
   findResultsForKey(keyOrNamespace) {
     const result = this.collection.findOne(keyOrNamespace);
     if (!result) {
@@ -102,7 +109,9 @@ export default class {
     return [result];
   }
 
-  _replaceParamsInString(string, params) {
+  _replaceParamsInString(string, paramsUnflatted) {
+    // flat params if not flat
+    const params = flat(paramsUnflatted);
     const open = '{$';
     const close = '}';
     let replacedString = string;
