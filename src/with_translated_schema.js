@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { composeWithTracker } from 'mantra-core';
 
 import translateSimpleSchema from './translate_simple_schema';
+import translateSimpleSchemaLegacy from './translate_simple_schema_1';
 /**
   withTranslatedSchema is a composer that translates the given schemas using .
   Pass a mapping-object where the keys are the properties containing these schemas
@@ -30,10 +31,15 @@ export const composer = mappingArrayOrFunction => ({ context, ...props }, onData
   if (_.isFunction(mappingArrayOrFunction)) {
     mapping = mappingArrayOrFunction({ context, ...props });
   }
+  const translateSimpleSchemaFunc = (
+    SimpleSchema.version === 2 ?
+    translateSimpleSchema :
+    translateSimpleSchemaLegacy
+  );
   const translatedProps = _.mapValues(
     mapping,
     (namespace, propName) => (
-      translateSimpleSchema({ i18n, SimpleSchema })(props[propName], namespace)
+      translateSimpleSchemaFunc({ i18n, SimpleSchema })(props[propName], namespace)
     ),
   );
   onData(null, { ...props, ...translatedProps });

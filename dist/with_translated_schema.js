@@ -20,6 +20,10 @@ var _translate_simple_schema = require('./translate_simple_schema');
 
 var _translate_simple_schema2 = _interopRequireDefault(_translate_simple_schema);
 
+var _translate_simple_schema_1 = require('./translate_simple_schema_1');
+
+var _translate_simple_schema_12 = _interopRequireDefault(_translate_simple_schema_1);
+
 /**
   withTranslatedSchema is a composer that translates the given schemas using .
   Pass a mapping-object where the keys are the properties containing these schemas
@@ -55,8 +59,9 @@ var composer = function composer(mappingArrayOrFunction) {
     if (_lodash2['default'].isFunction(mappingArrayOrFunction)) {
       mapping = mappingArrayOrFunction(_extends({ context: context }, props));
     }
+    var translateSimpleSchemaFunc = SimpleSchema.version === 2 ? _translate_simple_schema2['default'] : _translate_simple_schema_12['default'];
     var translatedProps = _lodash2['default'].mapValues(mapping, function (namespace, propName) {
-      return (0, _translate_simple_schema2['default'])({ i18n: i18n, SimpleSchema: SimpleSchema })(props[propName], namespace);
+      return translateSimpleSchemaFunc({ i18n: i18n, SimpleSchema: SimpleSchema })(props[propName], namespace);
     });
     onData(null, _extends({}, props, translatedProps));
   };
