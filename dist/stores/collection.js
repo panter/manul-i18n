@@ -73,7 +73,8 @@ var _default = (function () {
     key: 'getLocale',
     value: function getLocale() {
       if (this.Meteor.isServer) {
-        throw new this.Meteor.Error('getLocale can only be called on the client');
+        console.trace('getLocale can only be called on the client');
+        throw new this.Meteor.Error('getLocale can only be called on the client, pass _locale to translate if using from server');
       }
       return this.locale.get();
     }
@@ -107,7 +108,7 @@ var _default = (function () {
 
       // if locale is different (e.g. fallback), subscribe to that locale as well
       // so that it will be available soon
-      if (_locale !== this.getLocale()) {
+      if (this.Meteor.isClient && _locale !== this.getLocale()) {
         this.startSubscription(_locale);
       }
       if (!keyOrNamespace) {

@@ -38,6 +38,7 @@ export default class {
 
   getLocale() {
     if (this.Meteor.isServer) {
+      console.trace('getLocale can only be called on the client, pass _locale to translate if using from server');
       throw new this.Meteor.Error('getLocale can only be called on the client');
     }
     return this.locale.get();
@@ -59,7 +60,7 @@ export default class {
     const { _locale = this.getLocale(), ...params } = options;
     // if locale is different (e.g. fallback), subscribe to that locale as well
     // so that it will be available soon
-    if (_locale !== this.getLocale()) {
+    if (this.Meteor.isClient && _locale !== this.getLocale()) {
       this.startSubscription(_locale);
     }
     if (!keyOrNamespace) {
