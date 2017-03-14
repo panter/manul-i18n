@@ -73,8 +73,8 @@ var _default = (function () {
     key: 'getLocale',
     value: function getLocale() {
       if (this.Meteor.isServer) {
-        console.trace('getLocale can only be called on the client');
-        throw new this.Meteor.Error('getLocale can only be called on the client, pass _locale to translate if using from server');
+        console.trace('getLocale can only be called on the client, pass _locale to translate if using from server');
+        throw new this.Meteor.Error('getLocale can only be called on the client');
       }
       return this.locale.get();
     }
