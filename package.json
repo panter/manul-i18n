@@ -1,7 +1,7 @@
 {
   "name": "@panter/manul-i18n",
   "description": "",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "author": {
     "name": "Marco Wettstein",
     "email": "maw@panter.ch",
@@ -19,7 +19,7 @@
     "mantra-core": "^1.7.0",
     "react": "^15.0.0",
     "react-komposer": "^1.0.0",
-    "simpl-schema": "^0.1.0"
+    "simpl-schema": "^0.2.0"
   },
   "devDependencies": {
     "babel": "^5.8.23",
