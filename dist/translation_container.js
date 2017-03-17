@@ -1,22 +1,35 @@
 'use strict';
 
-var _extends = require('babel-runtime/helpers/extends')['default'];
-
-var _objectWithoutProperties = require('babel-runtime/helpers/object-without-properties')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.depsMapper = exports.composer = undefined;
+
+var _get2 = require('lodash/get');
+
+var _get3 = _interopRequireDefault(_get2);
+
+var _noop2 = require('lodash/noop');
+
+var _noop3 = _interopRequireDefault(_noop2);
+
+var _invoke2 = require('lodash/invoke');
+
+var _invoke3 = _interopRequireDefault(_invoke2);
+
+var _isFunction2 = require('lodash/isFunction');
+
+var _isFunction3 = _interopRequireDefault(_isFunction2);
+
+var _isString2 = require('lodash/isString');
+
+var _isString3 = _interopRequireDefault(_isString2);
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
-
-var _lodash = require('lodash');
-
-var _lodash2 = _interopRequireDefault(_lodash);
 
 var _mantraCore = require('mantra-core');
 
@@ -25,6 +38,10 @@ var _reactKomposer = require('react-komposer');
 var _i18n_service = require('./i18n_service');
 
 var _i18n_service2 = _interopRequireDefault(_i18n_service);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
 /**
 
@@ -92,18 +109,17 @@ var _i18n_service2 = _interopRequireDefault(_i18n_service);
 **/
 
 var getTranslationId = function getTranslationId(_ref) {
-  var children = _ref.children;
-  var _id = _ref._id;
-  return _id || (_lodash2['default'].isString(children) ? children : null);
+  var children = _ref.children,
+      _id = _ref._id;
+  return _id || ((0, _isString3.default)(children) ? children : null);
 };
 
 var getTranslation = function getTranslation(i18n, _ref2) {
-  var doc = _ref2.doc;
-  var _id = _ref2._id;
-  var disableEditorBypass = _ref2.disableEditorBypass;
-  var children = _ref2.children;
-
-  var params = _objectWithoutProperties(_ref2, ['doc', '_id', 'disableEditorBypass', 'children']);
+  var doc = _ref2.doc,
+      _id = _ref2._id,
+      disableEditorBypass = _ref2.disableEditorBypass,
+      children = _ref2.children,
+      params = _objectWithoutProperties(_ref2, ['doc', '_id', 'disableEditorBypass', 'children']);
 
   var translationId = getTranslationId({ children: children, _id: _id });
   if (doc) {
@@ -116,9 +132,8 @@ var getTranslation = function getTranslation(i18n, _ref2) {
 this function is outside of the composer so that it can be used in stubbing mode more easily
 **/
 var getTranslationProps = function getTranslationProps(context, props) {
-  var _context2 = context();
-
-  var i18n = _context2.i18n;
+  var _context = context(),
+      i18n = _context.i18n;
 
   var locale = i18n.getLocale();
   var translationId = getTranslationId(props);
@@ -126,53 +141,49 @@ var getTranslationProps = function getTranslationProps(context, props) {
 
   var isEditMode = i18n.isEditMode();
   var gotoEdit = function gotoEdit() {
-    if (_lodash2['default'].isFunction(i18n.editTranslationAction)) {
+    if ((0, _isFunction3.default)(i18n.editTranslationAction)) {
       // call function
       i18n.editTranslationAction(translationId);
-    } else if (_lodash2['default'].isString(i18n.editTranslationAction)) {
+    } else if ((0, _isString3.default)(i18n.editTranslationAction)) {
       // call mantra action
-      _lodash2['default'].invoke(props.actions, i18n.editTranslationAction, translationId);
+      (0, _invoke3.default)(props.actions, i18n.editTranslationAction, translationId);
     }
   };
   if (props.doc) {
     // no edit mode highlighting for docs yet and no gotoEdit;
-    gotoEdit = _lodash2['default'].noop;
+    gotoEdit = _noop3.default;
     isEditMode = false;
   }
   return { translationId: translationId, gotoEdit: gotoEdit, translation: translation, locale: locale, isEditMode: isEditMode };
 };
 
 var composer = function composer(_ref3, onData) {
-  var context = _ref3.context;
-
-  var props = _objectWithoutProperties(_ref3, ['context']);
+  var context = _ref3.context,
+      props = _objectWithoutProperties(_ref3, ['context']);
 
   onData(null, getTranslationProps(context, props));
 };
 exports.composer = composer;
-var depsMapper = function depsMapper(_context, actions) {
+var depsMapper = exports.depsMapper = function depsMapper(_context2, actions) {
   return {
     context: function context() {
-      return _context;
+      return _context2;
     },
     actions: actions
   };
 };
 
-exports.depsMapper = depsMapper;
 var Component = function Component(_ref4) {
-  var isEditMode = _ref4.isEditMode;
-  var gotoEdit = _ref4.gotoEdit;
-  var locale = _ref4.locale;
-  var _tagType = _ref4._tagType;
-  var _ref4$_props = _ref4._props;
+  var isEditMode = _ref4.isEditMode,
+      gotoEdit = _ref4.gotoEdit,
+      locale = _ref4.locale,
+      _tagType = _ref4._tagType,
+      _ref4$_props = _ref4._props,
+      _props = _ref4$_props === undefined ? {} : _ref4$_props,
+      translation = _ref4.translation,
+      children = _ref4.children;
 
-  var _props = _ref4$_props === undefined ? {} : _ref4$_props;
-
-  var translation = _ref4.translation;
-  var children = _ref4.children;
-
-  if (_lodash2['default'].isFunction(children)) {
+  if ((0, _isFunction3.default)(children)) {
     return children(translation);
   }
   var editorProps = {
@@ -184,7 +195,7 @@ var Component = function Component(_ref4) {
       return isEditMode && gotoEdit ? gotoEdit() : null;
     }
   };
-  return _react2['default'].createElement(_tagType || 'span', _extends({}, _props, editorProps, {
+  return _react2.default.createElement(_tagType || 'span', _extends({}, _props, editorProps, {
     dangerouslySetInnerHTML: {
       __html: translation
     },
@@ -194,7 +205,7 @@ var Component = function Component(_ref4) {
 
 Component.displayName = 'T';
 
-var composeWithTrackerServerSave = _lodash2['default'].get(global, 'Meteor.isServer') ? _mantraCore.compose : _mantraCore.composeWithTracker;
+var composeWithTrackerServerSave = (0, _get3.default)(global, 'Meteor.isServer') ? _mantraCore.compose : _mantraCore.composeWithTracker;
 var T = (0, _mantraCore.composeAll)(composeWithTrackerServerSave(composer), (0, _mantraCore.useDeps)(depsMapper))(Component);
 
 T.displayName = 'T';
@@ -202,9 +213,9 @@ T.displayName = 'T';
 (0, _reactKomposer.setComposerStub)(T, function (props) {
   var stubContext = function stubContext() {
     return {
-      i18n: new _i18n_service2['default']({
+      i18n: new _i18n_service2.default({
         translationStore: {
-          setLocale: _lodash2['default'].noop,
+          setLocale: _noop3.default,
           getLocale: function getLocale() {
             return 'de';
           },
@@ -220,5 +231,5 @@ T.displayName = 'T';
   return getTranslationProps(stubContext, props);
 });
 
-exports['default'] = T;
+exports.default = T;
 //# sourceMappingURL=translation_container.js.map
