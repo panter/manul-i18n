@@ -5,6 +5,14 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.depsMapper = exports.composer = undefined;
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _objectWithoutProperties2 = require('babel-runtime/helpers/objectWithoutProperties');
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
 var _get2 = require('lodash/get');
 
 var _get3 = _interopRequireDefault(_get2);
@@ -25,8 +33,6 @@ var _isString2 = require('lodash/isString');
 
 var _isString3 = _interopRequireDefault(_isString2);
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -40,8 +46,6 @@ var _i18n_service = require('./i18n_service');
 var _i18n_service2 = _interopRequireDefault(_i18n_service);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
 /**
 
@@ -119,7 +123,7 @@ var getTranslation = function getTranslation(i18n, _ref2) {
       _id = _ref2._id,
       disableEditorBypass = _ref2.disableEditorBypass,
       children = _ref2.children,
-      params = _objectWithoutProperties(_ref2, ['doc', '_id', 'disableEditorBypass', 'children']);
+      params = (0, _objectWithoutProperties3.default)(_ref2, ['doc', '_id', 'disableEditorBypass', 'children']);
 
   var translationId = getTranslationId({ children: children, _id: _id });
   if (doc) {
@@ -159,7 +163,7 @@ var getTranslationProps = function getTranslationProps(context, props) {
 
 var composer = function composer(_ref3, onData) {
   var context = _ref3.context,
-      props = _objectWithoutProperties(_ref3, ['context']);
+      props = (0, _objectWithoutProperties3.default)(_ref3, ['context']);
 
   onData(null, getTranslationProps(context, props));
 };
@@ -195,7 +199,7 @@ var Component = function Component(_ref4) {
       return isEditMode && gotoEdit ? gotoEdit() : null;
     }
   };
-  return _react2.default.createElement(_tagType || 'span', _extends({}, _props, editorProps, {
+  return _react2.default.createElement(_tagType || 'span', (0, _extends3.default)({}, _props, editorProps, {
     dangerouslySetInnerHTML: {
       __html: translation
     },

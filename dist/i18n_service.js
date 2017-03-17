@@ -4,6 +4,22 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
+
+var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
 var _get2 = require('lodash/get');
 
 var _get3 = _interopRequireDefault(_get2);
@@ -24,15 +40,7 @@ var _isArray2 = require('lodash/isArray');
 
 var _isArray3 = _interopRequireDefault(_isArray2);
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
 available in context as i18n.
@@ -65,8 +73,7 @@ var I18nClient = function () {
         shouldShowKeysAsFallback = _ref$shouldShowKeysAs === undefined ? function () {
       return false;
     } : _ref$shouldShowKeysAs;
-
-    _classCallCheck(this, I18nClient);
+    (0, _classCallCheck3.default)(this, I18nClient);
 
     this.translationStore = translationStore;
     this.isEditMode = isEditMode;
@@ -86,7 +93,7 @@ var I18nClient = function () {
   **/
 
 
-  _createClass(I18nClient, [{
+  (0, _createClass3.default)(I18nClient, [{
     key: 't',
     value: function t(keyOrArrayOfKeys) {
       var _this = this;
@@ -134,7 +141,7 @@ var I18nClient = function () {
       }
       var fallbackLocale = this.getFallbackLocale();
       if ((useFallbackForMissing || this.useFallbackForMissing) && this.getLocale() !== fallbackLocale) {
-        translation = this.translationStore.translate(keyOrNamespace, _extends({}, props, { _locale: fallbackLocale }));
+        translation = this.translationStore.translate(keyOrNamespace, (0, _extends3.default)({}, props, { _locale: fallbackLocale }));
       }
       // if still nil and is editor, return key if allowed
       if (!(0, _isNil3.default)(translation)) {
@@ -199,7 +206,7 @@ var I18nClient = function () {
       }
 
       var _locale$split = locale.split('-'),
-          _locale$split2 = _slicedToArray(_locale$split, 1),
+          _locale$split2 = (0, _slicedToArray3.default)(_locale$split, 1),
           lang = _locale$split2[0];
 
       if (this.supports(lang)) {
@@ -232,7 +239,6 @@ var I18nClient = function () {
       this.changeCallbacks.push(callback);
     }
   }]);
-
   return I18nClient;
 }();
 

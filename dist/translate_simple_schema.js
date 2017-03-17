@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _extend2 = require('lodash/extend');
 
 var _extend3 = _interopRequireDefault(_extend2);
@@ -19,8 +23,6 @@ var _get3 = _interopRequireDefault(_get2);
 var _cloneDeep2 = require('lodash/cloneDeep');
 
 var _cloneDeep3 = _interopRequireDefault(_cloneDeep2);
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _eval_simpleschema_regex_keys = require('./eval_simpleschema_regex_keys');
 
@@ -62,7 +64,7 @@ exports.default = function (_ref) {
         var fieldSchema = schema.schema(fullFieldName);
         (0, _extend3.default)(fieldSchema, {
           label: label || namespace + '.' + fullFieldName,
-          uniforms: _extends({
+          uniforms: (0, _extends3.default)({
             transform: defaultTransform,
             translations: fieldTranslations
           }, schemaOrg.getDefinition(fullFieldName).uniforms)

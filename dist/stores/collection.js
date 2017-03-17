@@ -4,6 +4,26 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _objectWithoutProperties2 = require('babel-runtime/helpers/objectWithoutProperties');
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
+
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
 var _mapValues2 = require('lodash/fp/mapValues');
 
 var _mapValues3 = _interopRequireDefault(_mapValues2);
@@ -36,19 +56,11 @@ var _has2 = require('lodash/has');
 
 var _has3 = _interopRequireDefault(_has2);
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _flat = require('flat');
 
 var _flat2 = _interopRequireDefault(_flat);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var _class = function () {
   function _class() {
@@ -59,7 +71,7 @@ var _class = function () {
         _ref$publicationName = _ref.publicationName,
         publicationName = _ref$publicationName === undefined ? 'translations' : _ref$publicationName;
 
-    _classCallCheck(this, _class);
+    (0, _classCallCheck3.default)(this, _class);
 
     this.publicationName = publicationName;
     this.collection = collection;
@@ -72,7 +84,7 @@ var _class = function () {
     }
   }
 
-  _createClass(_class, [{
+  (0, _createClass3.default)(_class, [{
     key: 'initClient',
     value: function initClient() {
       this.locale = new this.ReactiveVar();
@@ -90,7 +102,7 @@ var _class = function () {
       var _this = this;
 
       this.Meteor.publish(this.publicationName, function (locale) {
-        return _this.collection.find({}, { fields: _defineProperty({}, _this.getValueKey(locale), true) });
+        return _this.collection.find({}, { fields: (0, _defineProperty3.default)({}, _this.getValueKey(locale), true) });
       });
     }
   }, {
@@ -127,7 +139,7 @@ var _class = function () {
 
       var _options$_locale = options._locale,
           _locale = _options$_locale === undefined ? this.getLocale() : _options$_locale,
-          params = _objectWithoutProperties(options, ['_locale']);
+          params = (0, _objectWithoutProperties3.default)(options, ['_locale']);
       // if locale is different (e.g. fallback), subscribe to that locale as well
       // so that it will be available soon
 
@@ -187,14 +199,13 @@ var _class = function () {
       var open = '{$';
       var close = '}';
       var replacedString = string;
-      Object.keys(params).forEach(function (param) {
+      (0, _keys2.default)(params).forEach(function (param) {
         var substitution = (0, _get3.default)(params, param, '');
         replacedString = replacedString.split(open + param + close).join(substitution);
       });
       return replacedString;
     }
   }]);
-
   return _class;
 }();
 
