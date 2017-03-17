@@ -1,18 +1,18 @@
-// allowes to use SimpleSchema.RegEx.Email keys in the translation file, instead of the actual regex
 'use strict';
 
-var _extends = require('babel-runtime/helpers/extends')['default'];
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports['default'] = evalSimpleSchemaRegexKeys;
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports.default = evalSimpleSchemaRegexKeys;
+// allowes to use SimpleSchema.RegEx.Email keys in the translation file, instead of the actual regex
 function evalSimpleSchemaRegexKeys(messages) {
   if (messages && messages.regEx) {
     var regEx = messages.regEx.map(function (_ref) {
-      var msg = _ref.msg;
-      var exp = _ref.exp;
+      var msg = _ref.msg,
+          exp = _ref.exp;
       return {
         msg: msg,
         exp: exp && exp.split('.').reduce(function (o, i) {
@@ -24,6 +24,4 @@ function evalSimpleSchemaRegexKeys(messages) {
   }
   return messages;
 }
-
-module.exports = exports['default'];
 //# sourceMappingURL=eval_simpleschema_regex_keys.js.map

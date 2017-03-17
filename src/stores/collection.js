@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import { flow, sortBy, keyBy, mapValues } from 'lodash/fp';
+
 import flat, { unflatten } from 'flat';
 
 
@@ -79,12 +81,11 @@ export default class {
       return null;
     };
     const object = unflatten(
-         _.chain(results)
-         .sortBy(({ _id }) => _id.length)
-         .keyBy('_id')
-         .mapValues(getValue)
-         .value(),
-       { overwrite: true });
+      flow(
+      sortBy(({ _id }) => _id.length),
+      keyBy('_id'),
+      mapValues(getValue),
+    )(results), { overwrite: true });
     const objectOrString = _.get(object, keyOrNamespace);
     if (!_.isString(objectOrString) && _.isEmpty(objectOrString)) {
       // empty object or undefined

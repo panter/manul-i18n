@@ -1,27 +1,31 @@
 'use strict';
 
-var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
-
-var _extends = require('babel-runtime/helpers/extends')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _lodash = require('lodash');
+var _isObject2 = require('lodash/isObject');
 
-var _lodash2 = _interopRequireDefault(_lodash);
+var _isObject3 = _interopRequireDefault(_isObject2);
 
-var _default = function _default(_ref) {
+var _isString2 = require('lodash/isString');
+
+var _isString3 = _interopRequireDefault(_isString2);
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _class = function _class(_ref) {
   var _this = this;
 
-  var universeI18n = _ref.universeI18n;
-  var _ref$options = _ref.options;
-  var options = _ref$options === undefined ? {} : _ref$options;
+  var universeI18n = _ref.universeI18n,
+      _ref$options = _ref.options,
+      options = _ref$options === undefined ? {} : _ref$options;
 
-  _classCallCheck(this, _default);
+  _classCallCheck(this, _class);
 
   universeI18n.setOptions(_extends({
     hideMissing: true }, options));
@@ -29,13 +33,12 @@ var _default = function _default(_ref) {
   this.getLocale = universeI18n.getLocale;
   this.translate = universeI18n.createReactiveTranslator();
   this.has = function (keyOrNamespace) {
-    return _lodash2['default'].isString(_this.translate(keyOrNamespace));
+    return (0, _isString3.default)(_this.translate(keyOrNamespace));
   };
   this.hasObject = function (keyOrNamespace) {
-    return _lodash2['default'].isObject(_this.translate(keyOrNamespace));
+    return (0, _isObject3.default)(_this.translate(keyOrNamespace));
   };
 };
 
-exports['default'] = _default;
-module.exports = exports['default'];
+exports.default = _class;
 //# sourceMappingURL=universe_i18n.js.map

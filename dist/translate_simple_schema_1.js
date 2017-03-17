@@ -1,26 +1,29 @@
 'use strict';
 
-var _extends = require('babel-runtime/helpers/extends')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _lodash = require('lodash');
+var _isString2 = require('lodash/isString');
 
-var _lodash2 = _interopRequireDefault(_lodash);
+var _isString3 = _interopRequireDefault(_isString2);
+
+var _get2 = require('lodash/get');
+
+var _get3 = _interopRequireDefault(_get2);
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _eval_simpleschema_regex_keys = require('./eval_simpleschema_regex_keys');
 
 var _eval_simpleschema_regex_keys2 = _interopRequireDefault(_eval_simpleschema_regex_keys);
 
-/** legacy version for simpleschema 1 **/
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports['default'] = function (_ref) {
-  var i18n = _ref.i18n;
-  var SimpleSchema = _ref.SimpleSchema;
+/** legacy version for simpleschema 1 **/
+exports.default = function (_ref) {
+  var i18n = _ref.i18n,
+      SimpleSchema = _ref.SimpleSchema;
   return function (schema, namespace) {
     if (!SimpleSchema) {
       throw new Error('please provide SimpleSchema if you want to translate schemas');
@@ -29,12 +32,12 @@ exports['default'] = function (_ref) {
     var translations = i18n.t(namespace);
     var translatedDef = {};
     var _addSubSchemaTranslations = function _addSubSchemaTranslations() {
-      var parentFieldFullName = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-      var parentTranslation = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var parentFieldFullName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var parentTranslation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       schema.objectKeys(parentFieldFullName).forEach(function (field) {
         var fullFieldName = parentFieldFullName ? parentFieldFullName + '.' + field : field;
-        var fieldTranslation = _lodash2['default'].get(parentTranslation, field);
+        var fieldTranslation = (0, _get3.default)(parentTranslation, field);
         var fieldDefinition = schema.getDefinition(fullFieldName);
         var defaultTransform = function defaultTransform(value) {
           return fieldTranslation && fieldTranslation[value] || value;
@@ -46,7 +49,7 @@ exports['default'] = function (_ref) {
         var listDel = null;
         var toggleOptionalLabel = null;
         if (fieldTranslation) {
-          if (_lodash2['default'].isString(fieldTranslation)) {
+          if ((0, _isString3.default)(fieldTranslation)) {
             label = fieldTranslation;
           } else {
             label = fieldTranslation.label;
@@ -75,15 +78,12 @@ exports['default'] = function (_ref) {
       });
     };
 
-    // can override default transform
     _addSubSchemaTranslations(null, translations);
     var translatedScheme = new SimpleSchema([schema, translatedDef]);
-    var simpleSchemaMessages = (0, _eval_simpleschema_regex_keys2['default'])(i18n.t('simpleSchema'));
+    var simpleSchemaMessages = (0, _eval_simpleschema_regex_keys2.default)(i18n.t('simpleSchema'));
     translatedScheme.messages(simpleSchemaMessages);
 
     return translatedScheme;
   };
 };
-
-module.exports = exports['default'];
 //# sourceMappingURL=translate_simple_schema_1.js.map
