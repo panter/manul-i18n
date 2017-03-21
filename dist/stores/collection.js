@@ -87,6 +87,24 @@ var _class = function () {
   }
 
   (0, _createClass3.default)(_class, [{
+    key: 'getLocale',
+    value: function getLocale() {
+      if (this.Meteor.isServer) {
+        console.trace('getLocale can only be called on the client, pass _locale to translate if using from server');
+        throw new this.Meteor.Error('getLocale can only be called on the client');
+      }
+      return this.locale.get();
+    }
+  }, {
+    key: 'setLocale',
+    value: function setLocale(locale) {
+      if (this.Meteor.isServer) {
+        throw new this.Meteor.Error('setLocale can only be called on the client');
+      }
+      this.locale.set(locale);
+      this.startSubscription(locale); // restart
+    }
+  }, {
     key: 'initClient',
     value: function initClient() {
       this.locale = new this.ReactiveVar();
@@ -118,24 +136,7 @@ var _class = function () {
         return _this2.collection.find({}, { fields: (0, _defineProperty3.default)({}, _this2.getValueKey(locale), true) });
       });
     }
-  }, {
-    key: 'getLocale',
-    value: function getLocale() {
-      if (this.Meteor.isServer) {
-        console.trace('getLocale can only be called on the client, pass _locale to translate if using from server');
-        throw new this.Meteor.Error('getLocale can only be called on the client');
-      }
-      return this.locale.get();
-    }
-  }, {
-    key: 'setLocale',
-    value: function setLocale(locale) {
-      if (this.Meteor.isServer) {
-        throw new this.Meteor.Error('setLocale can only be called on the client');
-      }
-      this.locale.set(locale);
-      this.startSubscription(locale); // restart
-    }
+
     /* eslint class-methods-use-this: 0*/
 
   }, {
