@@ -4,6 +4,26 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _objectWithoutProperties2 = require('babel-runtime/helpers/objectWithoutProperties');
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
+
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
 var _mapValues2 = require('lodash/fp/mapValues');
 
 var _mapValues3 = _interopRequireDefault(_mapValues2);
@@ -36,31 +56,25 @@ var _has2 = require('lodash/has');
 
 var _has3 = _interopRequireDefault(_has2);
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _flat = require('flat');
 
 var _flat2 = _interopRequireDefault(_flat);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 var _class = function () {
   function _class() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
         Meteor = _ref.Meteor,
+        Ground = _ref.Ground,
         ReactiveVar = _ref.ReactiveVar,
         collection = _ref.collection,
         _ref$publicationName = _ref.publicationName,
         publicationName = _ref$publicationName === undefined ? 'translations' : _ref$publicationName;
 
-    _classCallCheck(this, _class);
+    (0, _classCallCheck3.default)(this, _class);
 
+    this.Ground = Ground;
     this.publicationName = publicationName;
     this.collection = collection;
     this.Meteor = Meteor;
@@ -72,25 +86,36 @@ var _class = function () {
     }
   }
 
-  _createClass(_class, [{
+  (0, _createClass3.default)(_class, [{
     key: 'initClient',
     value: function initClient() {
       this.locale = new this.ReactiveVar();
-      this.startSubscription(this.getLocale());
+
+      if (this.Ground) {
+        this.collectionGrounded = new this.Ground.Collection(this.collection._name + '-grounded');
+        this.collectionGrounded.observeSource(this.collection.find());
+      }
     }
   }, {
     key: 'startSubscription',
     value: function startSubscription(locale) {
+      var _this = this;
+
       // we keep all old subscription, so no stop or tracker here
-      this.Meteor.subscribe(this.publicationName, locale);
+      this.Meteor.subscribe(this.publicationName, locale, function () {
+        if (_this.collectionGrounded) {
+          // reset and keep only new ones
+          _this.collectionGrounded.keep(_this.collection.find());
+        }
+      });
     }
   }, {
     key: 'initServer',
     value: function initServer() {
-      var _this = this;
+      var _this2 = this;
 
       this.Meteor.publish(this.publicationName, function (locale) {
-        return _this.collection.find({}, { fields: _defineProperty({}, _this.getValueKey(locale), true) });
+        return _this2.collection.find({}, { fields: (0, _defineProperty3.default)({}, _this2.getValueKey(locale), true) });
       });
     }
   }, {
@@ -121,13 +146,13 @@ var _class = function () {
   }, {
     key: 'translate',
     value: function translate(keyOrNamespace) {
-      var _this2 = this;
+      var _this3 = this;
 
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       var _options$_locale = options._locale,
           _locale = _options$_locale === undefined ? this.getLocale() : _options$_locale,
-          params = _objectWithoutProperties(options, ['_locale']);
+          params = (0, _objectWithoutProperties3.default)(options, ['_locale']);
       // if locale is different (e.g. fallback), subscribe to that locale as well
       // so that it will be available soon
 
@@ -142,8 +167,8 @@ var _class = function () {
       var results = this.findResultsForKey(keyOrNamespace);
 
       var getValue = function getValue(entry) {
-        if ((0, _has3.default)(entry, _this2.getValueKey(_locale))) {
-          return _this2._replaceParamsInString((0, _get3.default)(entry, _this2.getValueKey(_locale)), params);
+        if ((0, _has3.default)(entry, _this3.getValueKey(_locale))) {
+          return _this3._replaceParamsInString((0, _get3.default)(entry, _this3.getValueKey(_locale)), params);
         }
         return null;
       };
@@ -159,9 +184,14 @@ var _class = function () {
       return objectOrString;
     }
   }, {
+    key: 'getCollection',
+    value: function getCollection() {
+      return this.collectionGrounded || this.collection;
+    }
+  }, {
     key: 'has',
     value: function has(keyOrNamespace) {
-      return this.collection.findOne(keyOrNamespace);
+      return this.getCollection().findOne(keyOrNamespace);
     }
   }, {
     key: 'hasObject',
@@ -171,11 +201,11 @@ var _class = function () {
   }, {
     key: 'findResultsForKey',
     value: function findResultsForKey(keyOrNamespace) {
-      var result = this.collection.findOne(keyOrNamespace);
+      var result = this.getCollection().findOne(keyOrNamespace);
       if (!result) {
         // a parent is requested, find all childs that start with keyOrNamespace
         // this is slow, so we do it only if there is no exact key
-        return this.collection.find({ _id: { $regex: keyOrNamespace + '/*' } }).fetch();
+        return this.getCollection().find({ _id: { $regex: keyOrNamespace + '/*' } }).fetch();
       }
       return [result];
     }
@@ -187,14 +217,13 @@ var _class = function () {
       var open = '{$';
       var close = '}';
       var replacedString = string;
-      Object.keys(params).forEach(function (param) {
+      (0, _keys2.default)(params).forEach(function (param) {
         var substitution = (0, _get3.default)(params, param, '');
         replacedString = replacedString.split(open + param + close).join(substitution);
       });
       return replacedString;
     }
   }]);
-
   return _class;
 }();
 

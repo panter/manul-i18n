@@ -7,10 +7,12 @@ import flat, { unflatten } from 'flat';
 export default class {
   constructor({
     Meteor,
+    Ground, // optional, enables caching via Ground https://github.com/GroundMeteor/
     ReactiveVar, // only needed on client
     collection,
     publicationName = 'translations',
     } = {}) {
+    this.Ground = Ground;
     this.publicationName = publicationName;
     this.collection = collection;
     this.Meteor = Meteor;
@@ -20,22 +22,6 @@ export default class {
     } else {
       this.initServer();
     }
-  }
-
-  initClient() {
-    this.locale = new this.ReactiveVar();
-    this.startSubscription(this.getLocale());
-  }
-
-  startSubscription(locale) {
-    // we keep all old subscription, so no stop or tracker here
-    this.Meteor.subscribe(this.publicationName, locale);
-  }
-
-  initServer() {
-    this.Meteor.publish(this.publicationName, locale =>
-       this.collection.find({}, { fields: { [this.getValueKey(locale)]: true } }),
-    );
   }
 
   getLocale() {
@@ -53,6 +39,33 @@ export default class {
     this.locale.set(locale);
     this.startSubscription(locale); // restart
   }
+
+  initClient() {
+    this.locale = new this.ReactiveVar();
+
+    if (this.Ground) {
+      this.collectionGrounded = new this.Ground.Collection(`${this.collection._name}-grounded`);
+      this.collectionGrounded.observeSource(this.collection.find());
+    }
+  }
+
+  startSubscription(locale) {
+    // we keep all old subscription, so no stop or tracker here
+    this.Meteor.subscribe(this.publicationName, locale, () => {
+      if (this.collectionGrounded) {
+        // reset and keep only new ones
+        this.collectionGrounded.keep(this.collection.find());
+      }
+    });
+  }
+
+  initServer() {
+    this.Meteor.publish(this.publicationName, locale =>
+       this.collection.find({}, { fields: { [this.getValueKey(locale)]: true } }),
+    );
+  }
+
+
   /* eslint class-methods-use-this: 0*/
   getValueKey(locale) {
     return `value_${locale}`;
@@ -93,20 +106,22 @@ export default class {
     }
     return objectOrString;
   }
-
+  getCollection() {
+    return this.collectionGrounded || this.collection;
+  }
   has(keyOrNamespace) {
-    return this.collection.findOne(keyOrNamespace);
+    return this.getCollection().findOne(keyOrNamespace);
   }
   hasObject(keyOrNamespace) {
     return this.findResultsForKey(keyOrNamespace).length > 1;
   }
 
   findResultsForKey(keyOrNamespace) {
-    const result = this.collection.findOne(keyOrNamespace);
+    const result = this.getCollection().findOne(keyOrNamespace);
     if (!result) {
       // a parent is requested, find all childs that start with keyOrNamespace
       // this is slow, so we do it only if there is no exact key
-      return this.collection.find({ _id: { $regex: `${keyOrNamespace}/*` } }).fetch();
+      return this.getCollection().find({ _id: { $regex: `${keyOrNamespace}/*` } }).fetch();
     }
     return [result];
   }

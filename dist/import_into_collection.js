@@ -4,9 +4,25 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _map2 = require('lodash/map');
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
+
+var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
+
+var _getIterator2 = require('babel-runtime/core-js/get-iterator');
+
+var _getIterator3 = _interopRequireDefault(_getIterator2);
+
+var _map2 = require('babel-runtime/core-js/map');
 
 var _map3 = _interopRequireDefault(_map2);
+
+var _map4 = require('lodash/map');
+
+var _map5 = _interopRequireDefault(_map4);
 
 var _zipObject2 = require('lodash/zipObject');
 
@@ -19,10 +35,6 @@ var _forEach3 = _interopRequireDefault(_forEach2);
 var _isEmpty2 = require('lodash/isEmpty');
 
 var _isEmpty3 = _interopRequireDefault(_isEmpty2);
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _flat = require('flat');
 
@@ -40,7 +52,7 @@ exports.default = function () {
       _ref$locales = _ref.locales,
       locales = _ref$locales === undefined ? ['de', 'en', 'it', 'fr'] : _ref$locales;
 
-  var entries = new Map();
+  var entries = new _map3.default();
 
   var valueKeyForLocale = function valueKeyForLocale(locale) {
     return 'value_' + locale;
@@ -51,9 +63,9 @@ exports.default = function () {
       var translationsFlat = (0, _flat2.default)(translationsForLocale);
       (0, _forEach3.default)(translationsFlat, function (value, key) {
         if (!entries.has(key)) {
-          entries.set(key, (0, _zipObject3.default)((0, _map3.default)(locales, function (locale) {
+          entries.set(key, (0, _zipObject3.default)((0, _map5.default)(locales, function (locale) {
             return valueKeyForLocale(locale);
-          }), (0, _map3.default)(locales, function () {
+          }), (0, _map5.default)(locales, function () {
             return null;
           })));
         }
@@ -69,8 +81,8 @@ exports.default = function () {
   var _iteratorError = undefined;
 
   try {
-    for (var _iterator = entries[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var _step$value = _slicedToArray(_step.value, 2),
+    for (var _iterator = (0, _getIterator3.default)(entries), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var _step$value = (0, _slicedToArray3.default)(_step.value, 2),
           key = _step$value[0],
           value = _step$value[1];
 
@@ -82,7 +94,7 @@ exports.default = function () {
           // console.log('skipped', key);
         }
       } else {
-        collection.insert(_extends({ _id: key }, value));
+        collection.insert((0, _extends3.default)({ _id: key }, value));
         console.log('inserted', key);
       }
     }

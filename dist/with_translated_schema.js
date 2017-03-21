@@ -5,6 +5,14 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.composer = undefined;
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _objectWithoutProperties2 = require('babel-runtime/helpers/objectWithoutProperties');
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
 var _mapValues2 = require('lodash/mapValues');
 
 var _mapValues3 = _interopRequireDefault(_mapValues2);
@@ -12,8 +20,6 @@ var _mapValues3 = _interopRequireDefault(_mapValues2);
 var _isFunction2 = require('lodash/isFunction');
 
 var _isFunction3 = _interopRequireDefault(_isFunction2);
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _mantraCore = require('mantra-core');
 
@@ -27,8 +33,6 @@ var _translate_simple_schema_2 = _interopRequireDefault(_translate_simple_schema
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-
 /**
   withTranslatedSchema is a composer that translates the given schemas using .
   Pass a mapping-object where the keys are the properties containing these schemas
@@ -39,7 +43,7 @@ function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in ob
 var composer = function composer(mappingArrayOrFunction) {
   return function (_ref, onData) {
     var context = _ref.context,
-        props = _objectWithoutProperties(_ref, ['context']);
+        props = (0, _objectWithoutProperties3.default)(_ref, ['context']);
 
     var _context = context(),
         i18n = _context.i18n;
@@ -60,13 +64,13 @@ var composer = function composer(mappingArrayOrFunction) {
 
     var mapping = mappingArrayOrFunction;
     if ((0, _isFunction3.default)(mappingArrayOrFunction)) {
-      mapping = mappingArrayOrFunction(_extends({ context: context }, props));
+      mapping = mappingArrayOrFunction((0, _extends3.default)({ context: context }, props));
     }
     var translateSimpleSchemaFunc = SimpleSchema.version === 2 ? _translate_simple_schema2.default : _translate_simple_schema_2.default;
     var translatedProps = (0, _mapValues3.default)(mapping, function (namespace, propName) {
       return translateSimpleSchemaFunc({ i18n: i18n, SimpleSchema: SimpleSchema })(props[propName], namespace);
     });
-    onData(null, _extends({}, props, translatedProps));
+    onData(null, (0, _extends3.default)({}, props, translatedProps));
   };
 };
 
