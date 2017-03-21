@@ -66,6 +66,7 @@ var _class = function () {
   function _class() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
         Meteor = _ref.Meteor,
+        Ground = _ref.Ground,
         ReactiveVar = _ref.ReactiveVar,
         collection = _ref.collection,
         _ref$publicationName = _ref.publicationName,
@@ -73,6 +74,7 @@ var _class = function () {
 
     (0, _classCallCheck3.default)(this, _class);
 
+    this.Ground = Ground;
     this.publicationName = publicationName;
     this.collection = collection;
     this.Meteor = Meteor;
@@ -88,21 +90,32 @@ var _class = function () {
     key: 'initClient',
     value: function initClient() {
       this.locale = new this.ReactiveVar();
-      this.startSubscription(this.getLocale());
+
+      if (this.Ground) {
+        this.collectionGrounded = new this.Ground.Collection(this.collection._name + '-grounded');
+        this.collectionGrounded.observeSource(this.collection.find());
+      }
     }
   }, {
     key: 'startSubscription',
     value: function startSubscription(locale) {
+      var _this = this;
+
       // we keep all old subscription, so no stop or tracker here
-      this.Meteor.subscribe(this.publicationName, locale);
+      this.Meteor.subscribe(this.publicationName, locale, function () {
+        if (_this.collectionGrounded) {
+          // reset and keep only new ones
+          _this.collectionGrounded.keep(_this.collection.find());
+        }
+      });
     }
   }, {
     key: 'initServer',
     value: function initServer() {
-      var _this = this;
+      var _this2 = this;
 
       this.Meteor.publish(this.publicationName, function (locale) {
-        return _this.collection.find({}, { fields: (0, _defineProperty3.default)({}, _this.getValueKey(locale), true) });
+        return _this2.collection.find({}, { fields: (0, _defineProperty3.default)({}, _this2.getValueKey(locale), true) });
       });
     }
   }, {
@@ -133,7 +146,7 @@ var _class = function () {
   }, {
     key: 'translate',
     value: function translate(keyOrNamespace) {
-      var _this2 = this;
+      var _this3 = this;
 
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -154,8 +167,8 @@ var _class = function () {
       var results = this.findResultsForKey(keyOrNamespace);
 
       var getValue = function getValue(entry) {
-        if ((0, _has3.default)(entry, _this2.getValueKey(_locale))) {
-          return _this2._replaceParamsInString((0, _get3.default)(entry, _this2.getValueKey(_locale)), params);
+        if ((0, _has3.default)(entry, _this3.getValueKey(_locale))) {
+          return _this3._replaceParamsInString((0, _get3.default)(entry, _this3.getValueKey(_locale)), params);
         }
         return null;
       };
@@ -171,9 +184,14 @@ var _class = function () {
       return objectOrString;
     }
   }, {
+    key: 'getCollection',
+    value: function getCollection() {
+      return this.collectionGrounded || this.collection;
+    }
+  }, {
     key: 'has',
     value: function has(keyOrNamespace) {
-      return this.collection.findOne(keyOrNamespace);
+      return this.getCollection().findOne(keyOrNamespace);
     }
   }, {
     key: 'hasObject',
@@ -183,11 +201,11 @@ var _class = function () {
   }, {
     key: 'findResultsForKey',
     value: function findResultsForKey(keyOrNamespace) {
-      var result = this.collection.findOne(keyOrNamespace);
+      var result = this.getCollection().findOne(keyOrNamespace);
       if (!result) {
         // a parent is requested, find all childs that start with keyOrNamespace
         // this is slow, so we do it only if there is no exact key
-        return this.collection.find({ _id: { $regex: keyOrNamespace + '/*' } }).fetch();
+        return this.getCollection().find({ _id: { $regex: keyOrNamespace + '/*' } }).fetch();
       }
       return [result];
     }
