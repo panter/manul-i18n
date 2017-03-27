@@ -50,7 +50,7 @@ export default class {
   }
 
   startSubscription(locale) {
-    if (this.subscriptions[locale]) {
+    if (!locale || this.subscriptions[locale]) {
       return; // do not resubscribe;
     }
     // we keep all old subscription, so no stop or tracker here
@@ -63,8 +63,13 @@ export default class {
   }
 
   initServer() {
-    this.Meteor.publish(this.publicationName, locale =>
-       this.collection.find({}, { fields: { [this.getValueKey(locale)]: true } }),
+    this.Meteor.publish(this.publicationName, (locale) => {
+      if (!locale) {
+        this.ready();
+        return null;
+      }
+      return this.collection.find({}, { fields: { [this.getValueKey(locale)]: true } });
+    },
     );
   }
 
