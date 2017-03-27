@@ -42,7 +42,7 @@ export default class {
 
   initClient() {
     this.locale = new this.ReactiveVar();
-
+    this.subscriptions = {};
     if (this.Ground) {
       this.collectionGrounded = new this.Ground.Collection(`${this.collection._name}-grounded`);
       this.collectionGrounded.observeSource(this.collection.find());
@@ -50,8 +50,11 @@ export default class {
   }
 
   startSubscription(locale) {
+    if (this.subscriptions[locale]) {
+      return; // do not resubscribe;
+    }
     // we keep all old subscription, so no stop or tracker here
-    this.Meteor.subscribe(this.publicationName, locale, () => {
+    this.subscriptions[locale] = this.Meteor.subscribe(this.publicationName, locale, () => {
       if (this.collectionGrounded) {
         // reset and keep only new ones
         this.collectionGrounded.keep(this.collection.find());
