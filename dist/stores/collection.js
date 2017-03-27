@@ -119,7 +119,7 @@ var _class = function () {
     value: function startSubscription(locale) {
       var _this = this;
 
-      if (this.subscriptions[locale]) {
+      if (!locale || this.subscriptions[locale]) {
         return; // do not resubscribe;
       }
       // we keep all old subscription, so no stop or tracker here
@@ -136,6 +136,10 @@ var _class = function () {
       var _this2 = this;
 
       this.Meteor.publish(this.publicationName, function (locale) {
+        if (!locale) {
+          _this2.ready();
+          return null;
+        }
         return _this2.collection.find({}, { fields: (0, _defineProperty3.default)({}, _this2.getValueKey(locale), true) });
       });
     }
