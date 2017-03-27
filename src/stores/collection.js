@@ -63,12 +63,13 @@ export default class {
   }
 
   initServer() {
-    this.Meteor.publish(this.publicationName, (locale) => {
+    const that = this;
+    this.Meteor.publish(this.publicationName, function publishTranslations(locale) {
       if (!locale) {
         this.ready();
         return null;
       }
-      return this.collection.find({}, { fields: { [this.getValueKey(locale)]: true } });
+      return that.collection.find({}, { fields: { [that.getValueKey(locale)]: true } });
     },
     );
   }
