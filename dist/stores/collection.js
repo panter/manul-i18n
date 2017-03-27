@@ -133,14 +133,13 @@ var _class = function () {
   }, {
     key: 'initServer',
     value: function initServer() {
-      var _this2 = this;
-
-      this.Meteor.publish(this.publicationName, function (locale) {
+      var that = this;
+      this.Meteor.publish(this.publicationName, function publishTranslations(locale) {
         if (!locale) {
-          _this2.ready();
+          this.ready();
           return null;
         }
-        return _this2.collection.find({}, { fields: (0, _defineProperty3.default)({}, _this2.getValueKey(locale), true) });
+        return that.collection.find({}, { fields: (0, _defineProperty3.default)({}, that.getValueKey(locale), true) });
       });
     }
 
@@ -154,7 +153,7 @@ var _class = function () {
   }, {
     key: 'translate',
     value: function translate(keyOrNamespace) {
-      var _this3 = this;
+      var _this2 = this;
 
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -175,8 +174,8 @@ var _class = function () {
       var results = this.findResultsForKey(keyOrNamespace);
 
       var getValue = function getValue(entry) {
-        if ((0, _has3.default)(entry, _this3.getValueKey(_locale))) {
-          return _this3._replaceParamsInString((0, _get3.default)(entry, _this3.getValueKey(_locale)), params);
+        if ((0, _has3.default)(entry, _this2.getValueKey(_locale))) {
+          return _this2._replaceParamsInString((0, _get3.default)(entry, _this2.getValueKey(_locale)), params);
         }
         return null;
       };
