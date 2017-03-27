@@ -108,7 +108,7 @@ var _class = function () {
     key: 'initClient',
     value: function initClient() {
       this.locale = new this.ReactiveVar();
-
+      this.subscriptions = {};
       if (this.Ground) {
         this.collectionGrounded = new this.Ground.Collection(this.collection._name + '-grounded');
         this.collectionGrounded.observeSource(this.collection.find());
@@ -119,8 +119,11 @@ var _class = function () {
     value: function startSubscription(locale) {
       var _this = this;
 
+      if (this.subscriptions[locale]) {
+        return; // do not resubscribe;
+      }
       // we keep all old subscription, so no stop or tracker here
-      this.Meteor.subscribe(this.publicationName, locale, function () {
+      this.subscriptions[locale] = this.Meteor.subscribe(this.publicationName, locale, function () {
         if (_this.collectionGrounded) {
           // reset and keep only new ones
           _this.collectionGrounded.keep(_this.collection.find());
