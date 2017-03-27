@@ -87,38 +87,6 @@ var _class = function () {
   }
 
   (0, _createClass3.default)(_class, [{
-    key: 'initClient',
-    value: function initClient() {
-      this.locale = new this.ReactiveVar();
-
-      if (this.Ground) {
-        this.collectionGrounded = new this.Ground.Collection(this.collection._name + '-grounded');
-        this.collectionGrounded.observeSource(this.collection.find());
-      }
-    }
-  }, {
-    key: 'startSubscription',
-    value: function startSubscription(locale) {
-      var _this = this;
-
-      // we keep all old subscription, so no stop or tracker here
-      this.Meteor.subscribe(this.publicationName, locale, function () {
-        if (_this.collectionGrounded) {
-          // reset and keep only new ones
-          _this.collectionGrounded.keep(_this.collection.find());
-        }
-      });
-    }
-  }, {
-    key: 'initServer',
-    value: function initServer() {
-      var _this2 = this;
-
-      this.Meteor.publish(this.publicationName, function (locale) {
-        return _this2.collection.find({}, { fields: (0, _defineProperty3.default)({}, _this2.getValueKey(locale), true) });
-      });
-    }
-  }, {
     key: 'getLocale',
     value: function getLocale() {
       if (this.Meteor.isServer) {
@@ -136,6 +104,42 @@ var _class = function () {
       this.locale.set(locale);
       this.startSubscription(locale); // restart
     }
+  }, {
+    key: 'initClient',
+    value: function initClient() {
+      this.locale = new this.ReactiveVar();
+      this.subscriptions = {};
+      if (this.Ground) {
+        this.collectionGrounded = new this.Ground.Collection(this.collection._name + '-grounded');
+        this.collectionGrounded.observeSource(this.collection.find());
+      }
+    }
+  }, {
+    key: 'startSubscription',
+    value: function startSubscription(locale) {
+      var _this = this;
+
+      if (this.subscriptions[locale]) {
+        return; // do not resubscribe;
+      }
+      // we keep all old subscription, so no stop or tracker here
+      this.subscriptions[locale] = this.Meteor.subscribe(this.publicationName, locale, function () {
+        if (_this.collectionGrounded) {
+          // reset and keep only new ones
+          _this.collectionGrounded.keep(_this.collection.find());
+        }
+      });
+    }
+  }, {
+    key: 'initServer',
+    value: function initServer() {
+      var _this2 = this;
+
+      this.Meteor.publish(this.publicationName, function (locale) {
+        return _this2.collection.find({}, { fields: (0, _defineProperty3.default)({}, _this2.getValueKey(locale), true) });
+      });
+    }
+
     /* eslint class-methods-use-this: 0*/
 
   }, {
