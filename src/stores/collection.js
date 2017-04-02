@@ -17,6 +17,7 @@ export default class {
     this.collection = collection;
     this.Meteor = Meteor;
     this.ReactiveVar = ReactiveVar;
+
     if (Meteor.isClient) {
       this.initClient();
     } else {
@@ -49,6 +50,7 @@ export default class {
     }
   }
 
+
   startSubscription(locale) {
     if (!locale || this.subscriptions[locale]) {
       return; // do not resubscribe;
@@ -79,6 +81,15 @@ export default class {
   getValueKey(locale) {
     return `value_${locale}`;
   }
+  _getValue(entry, locale, params) {
+    if (_.has(entry, this.getValueKey(locale))) {
+      return this._replaceParamsInString(
+          _.get(entry, this.getValueKey(locale)),
+        params,
+      );
+    }
+    return null;
+  }
 
   translate(keyOrNamespace, options = {}) {
     const { _locale = this.getLocale(), ...params } = options;
@@ -91,29 +102,26 @@ export default class {
       return '';
     }
 
-    const results = this.findResultsForKey(keyOrNamespace);
-
-    const getValue = (entry) => {
-      if (_.has(entry, this.getValueKey(_locale))) {
-        return this._replaceParamsInString(
-            _.get(entry, this.getValueKey(_locale)),
-          params,
-        );
+    const entryByKey = this._findEntryForKey(keyOrNamespace);
+    if (entryByKey) {
+      return this._getValue(entryByKey, _locale, params);
+    } else if (this.subscriptions[_locale].ready()) {
+      // try to find for namespace
+      // this is expensive, so we do it only if subscription is ready
+      const entries = this._findEntriesForNamespace(keyOrNamespace);
+      const fullObject = unflatten(
+        flow(
+        sortBy(({ _id }) => _id.length),
+        keyBy('_id'),
+        mapValues(entry => this._getValue(entry, _locale, params)),
+      )(entries), { overwrite: true });
+      const objectForNamespace = _.get(fullObject, keyOrNamespace);
+      if (_.isEmpty(objectForNamespace)) {
+        return null;
       }
-      return null;
-    };
-    const object = unflatten(
-      flow(
-      sortBy(({ _id }) => _id.length),
-      keyBy('_id'),
-      mapValues(getValue),
-    )(results), { overwrite: true });
-    const objectOrString = _.get(object, keyOrNamespace);
-    if (!_.isString(objectOrString) && _.isEmpty(objectOrString)) {
-      // empty object or undefined
-      return null;
+      return objectForNamespace;
     }
-    return objectOrString;
+    return null;
   }
   getCollection() {
     return this.collectionGrounded || this.collection;
@@ -121,18 +129,22 @@ export default class {
   has(keyOrNamespace) {
     return this.getCollection().findOne(keyOrNamespace);
   }
-  hasObject(keyOrNamespace) {
-    return this.findResultsForKey(keyOrNamespace).length > 1;
+  hasObject(namespace) {
+    return this.findResultsForNamespace(namespace).length > 1;
   }
 
-  findResultsForKey(keyOrNamespace) {
-    const result = this.getCollection().findOne(keyOrNamespace);
-    if (!result) {
-      // a parent is requested, find all childs that start with keyOrNamespace
-      // this is slow, so we do it only if there is no exact key
-      return this.getCollection().find({ _id: { $regex: `${keyOrNamespace}/*` } }).fetch();
-    }
-    return [result];
+
+  /**
+  returns either one or multiple results
+  multiple results means that an namespace was requested
+  **/
+  _findEntryForKey(keyOrNamespace) {
+    return this.getCollection().findOne(keyOrNamespace);
+  }
+
+  _findEntriesForNamespace(namespace) {
+    // console.log('doing expensive fetch', namespace);
+    return this.getCollection().find({ _id: { $regex: `^${namespace}` } }).fetch();
   }
 
   _replaceParamsInString(string, paramsUnflatted) {

@@ -44,10 +44,6 @@ var _isEmpty2 = require('lodash/isEmpty');
 
 var _isEmpty3 = _interopRequireDefault(_isEmpty2);
 
-var _isString2 = require('lodash/isString');
-
-var _isString3 = _interopRequireDefault(_isString2);
-
 var _get2 = require('lodash/get');
 
 var _get3 = _interopRequireDefault(_get2);
@@ -79,6 +75,7 @@ var _class = function () {
     this.collection = collection;
     this.Meteor = Meteor;
     this.ReactiveVar = ReactiveVar;
+
     if (Meteor.isClient) {
       this.initClient();
     } else {
@@ -151,6 +148,14 @@ var _class = function () {
       return 'value_' + locale;
     }
   }, {
+    key: '_getValue',
+    value: function _getValue(entry, locale, params) {
+      if ((0, _has3.default)(entry, this.getValueKey(locale))) {
+        return this._replaceParamsInString((0, _get3.default)(entry, this.getValueKey(locale)), params);
+      }
+      return null;
+    }
+  }, {
     key: 'translate',
     value: function translate(keyOrNamespace) {
       var _this2 = this;
@@ -171,24 +176,26 @@ var _class = function () {
         return '';
       }
 
-      var results = this.findResultsForKey(keyOrNamespace);
-
-      var getValue = function getValue(entry) {
-        if ((0, _has3.default)(entry, _this2.getValueKey(_locale))) {
-          return _this2._replaceParamsInString((0, _get3.default)(entry, _this2.getValueKey(_locale)), params);
+      var entryByKey = this._findEntryForKey(keyOrNamespace);
+      if (entryByKey) {
+        return this._getValue(entryByKey, _locale, params);
+      } else if (this.subscriptions[_locale].ready()) {
+        // try to find for namespace
+        // this is expensive, so we do it only if subscription is ready
+        var entries = this._findEntriesForNamespace(keyOrNamespace);
+        var fullObject = (0, _flat.unflatten)((0, _flow3.default)((0, _sortBy3.default)(function (_ref2) {
+          var _id = _ref2._id;
+          return _id.length;
+        }), (0, _keyBy3.default)('_id'), (0, _mapValues3.default)(function (entry) {
+          return _this2._getValue(entry, _locale, params);
+        }))(entries), { overwrite: true });
+        var objectForNamespace = (0, _get3.default)(fullObject, keyOrNamespace);
+        if ((0, _isEmpty3.default)(objectForNamespace)) {
+          return null;
         }
-        return null;
-      };
-      var object = (0, _flat.unflatten)((0, _flow3.default)((0, _sortBy3.default)(function (_ref2) {
-        var _id = _ref2._id;
-        return _id.length;
-      }), (0, _keyBy3.default)('_id'), (0, _mapValues3.default)(getValue))(results), { overwrite: true });
-      var objectOrString = (0, _get3.default)(object, keyOrNamespace);
-      if (!(0, _isString3.default)(objectOrString) && (0, _isEmpty3.default)(objectOrString)) {
-        // empty object or undefined
-        return null;
+        return objectForNamespace;
       }
-      return objectOrString;
+      return null;
     }
   }, {
     key: 'getCollection',
@@ -202,19 +209,25 @@ var _class = function () {
     }
   }, {
     key: 'hasObject',
-    value: function hasObject(keyOrNamespace) {
-      return this.findResultsForKey(keyOrNamespace).length > 1;
+    value: function hasObject(namespace) {
+      return this.findResultsForNamespace(namespace).length > 1;
+    }
+
+    /**
+    returns either one or multiple results
+    multiple results means that an namespace was requested
+    **/
+
+  }, {
+    key: '_findEntryForKey',
+    value: function _findEntryForKey(keyOrNamespace) {
+      return this.getCollection().findOne(keyOrNamespace);
     }
   }, {
-    key: 'findResultsForKey',
-    value: function findResultsForKey(keyOrNamespace) {
-      var result = this.getCollection().findOne(keyOrNamespace);
-      if (!result) {
-        // a parent is requested, find all childs that start with keyOrNamespace
-        // this is slow, so we do it only if there is no exact key
-        return this.getCollection().find({ _id: { $regex: keyOrNamespace + '/*' } }).fetch();
-      }
-      return [result];
+    key: '_findEntriesForNamespace',
+    value: function _findEntriesForNamespace(namespace) {
+      // console.log('doing expensive fetch', namespace);
+      return this.getCollection().find({ _id: { $regex: '^' + namespace } }).fetch();
     }
   }, {
     key: '_replaceParamsInString',
