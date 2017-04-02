@@ -84,7 +84,7 @@ const getTranslation = (i18n, { doc, _id, disableEditorBypass, children, ...para
 /**
 this function is outside of the composer so that it can be used in stubbing mode more easily
 **/
-const getTranslationProps = (context, props) => {
+const getTranslationProps = (context, { actions, ...props }) => {
   const { i18n } = context();
   const locale = i18n.getLocale();
   const translationId = getTranslationId(props);
@@ -97,7 +97,7 @@ const getTranslationProps = (context, props) => {
       i18n.editTranslationAction(translationId);
     } else if (_.isString(i18n.editTranslationAction)) {
       // call mantra action
-      _.invoke(props.actions, i18n.editTranslationAction, translationId);
+      _.invoke(actions, i18n.editTranslationAction, translationId);
     }
   };
   if (props.doc) {

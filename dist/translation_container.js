@@ -135,7 +135,10 @@ var getTranslation = function getTranslation(i18n, _ref2) {
 /**
 this function is outside of the composer so that it can be used in stubbing mode more easily
 **/
-var getTranslationProps = function getTranslationProps(context, props) {
+var getTranslationProps = function getTranslationProps(context, _ref3) {
+  var actions = _ref3.actions,
+      props = (0, _objectWithoutProperties3.default)(_ref3, ['actions']);
+
   var _context = context(),
       i18n = _context.i18n;
 
@@ -150,7 +153,7 @@ var getTranslationProps = function getTranslationProps(context, props) {
       i18n.editTranslationAction(translationId);
     } else if ((0, _isString3.default)(i18n.editTranslationAction)) {
       // call mantra action
-      (0, _invoke3.default)(props.actions, i18n.editTranslationAction, translationId);
+      (0, _invoke3.default)(actions, i18n.editTranslationAction, translationId);
     }
   };
   if (props.doc) {
@@ -161,9 +164,9 @@ var getTranslationProps = function getTranslationProps(context, props) {
   return { translationId: translationId, gotoEdit: gotoEdit, translation: translation, locale: locale, isEditMode: isEditMode };
 };
 
-var composer = function composer(_ref3, onData) {
-  var context = _ref3.context,
-      props = (0, _objectWithoutProperties3.default)(_ref3, ['context']);
+var composer = function composer(_ref4, onData) {
+  var context = _ref4.context,
+      props = (0, _objectWithoutProperties3.default)(_ref4, ['context']);
 
   onData(null, getTranslationProps(context, props));
 };
@@ -177,15 +180,15 @@ var depsMapper = exports.depsMapper = function depsMapper(_context2, actions) {
   };
 };
 
-var Component = function Component(_ref4) {
-  var isEditMode = _ref4.isEditMode,
-      gotoEdit = _ref4.gotoEdit,
-      locale = _ref4.locale,
-      _tagType = _ref4._tagType,
-      _ref4$_props = _ref4._props,
-      _props = _ref4$_props === undefined ? {} : _ref4$_props,
-      translation = _ref4.translation,
-      children = _ref4.children;
+var Component = function Component(_ref5) {
+  var isEditMode = _ref5.isEditMode,
+      gotoEdit = _ref5.gotoEdit,
+      locale = _ref5.locale,
+      _tagType = _ref5._tagType,
+      _ref5$_props = _ref5._props,
+      _props = _ref5$_props === undefined ? {} : _ref5$_props,
+      translation = _ref5.translation,
+      children = _ref5.children;
 
   if ((0, _isFunction3.default)(children)) {
     return children(translation);
