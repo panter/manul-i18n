@@ -1,7 +1,7 @@
 {
   "name": "@panter/manul-i18n",
   "description": "",
-  "version": "0.4.11",
+  "version": "0.4.12",
   "author": {
     "name": "Marco Wettstein",
     "email": "maw@panter.ch",
@@ -48,6 +48,6 @@
   "main": "./dist/manul-i18n.js",
   "dependencies": {
     "flat": "^2.0.1",
-    "recompose": "^0.22.0"
+    "recompose": "^0.21.0"
   }
 }
