@@ -13,25 +13,29 @@ var _objectWithoutProperties2 = require('babel-runtime/helpers/objectWithoutProp
 
 var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
 
-var _get2 = require('lodash/get');
+var _pure2 = require('recompose/pure');
 
-var _get3 = _interopRequireDefault(_get2);
+var _pure3 = _interopRequireDefault(_pure2);
 
-var _noop2 = require('lodash/noop');
+var _invokeArgs2 = require('lodash/fp/invokeArgs');
 
-var _noop3 = _interopRequireDefault(_noop2);
+var _invokeArgs3 = _interopRequireDefault(_invokeArgs2);
 
-var _invoke2 = require('lodash/invoke');
-
-var _invoke3 = _interopRequireDefault(_invoke2);
-
-var _isFunction2 = require('lodash/isFunction');
+var _isFunction2 = require('lodash/fp/isFunction');
 
 var _isFunction3 = _interopRequireDefault(_isFunction2);
 
-var _isString2 = require('lodash/isString');
+var _isString2 = require('lodash/fp/isString');
 
 var _isString3 = _interopRequireDefault(_isString2);
+
+var _noop2 = require('lodash/fp/noop');
+
+var _noop3 = _interopRequireDefault(_noop2);
+
+var _get2 = require('lodash/fp/get');
+
+var _get3 = _interopRequireDefault(_get2);
 
 var _react = require('react');
 
@@ -136,8 +140,8 @@ var getTranslation = function getTranslation(i18n, _ref2) {
 this function is outside of the composer so that it can be used in stubbing mode more easily
 **/
 var getTranslationProps = function getTranslationProps(context, _ref3) {
-  var actions = _ref3.actions,
-      props = (0, _objectWithoutProperties3.default)(_ref3, ['actions']);
+  var gotoEdit = _ref3.gotoEdit,
+      props = (0, _objectWithoutProperties3.default)(_ref3, ['gotoEdit']);
 
   var _context = context(),
       i18n = _context.i18n;
@@ -147,17 +151,10 @@ var getTranslationProps = function getTranslationProps(context, _ref3) {
   var translation = getTranslation(i18n, props);
 
   var isEditMode = i18n.isEditMode();
-  var gotoEdit = function gotoEdit() {
-    if ((0, _isFunction3.default)(i18n.editTranslationAction)) {
-      // call function
-      i18n.editTranslationAction(translationId);
-    } else if ((0, _isString3.default)(i18n.editTranslationAction)) {
-      // call mantra action
-      (0, _invoke3.default)(actions, i18n.editTranslationAction, translationId);
-    }
-  };
+
   if (props.doc) {
     // no edit mode highlighting for docs yet and no gotoEdit;
+    /* eslint no-param-reassign: 0*/
     gotoEdit = _noop3.default;
     isEditMode = false;
   }
@@ -170,19 +167,29 @@ var composer = function composer(_ref4, onData) {
 
   onData(null, getTranslationProps(context, props));
 };
+
 exports.composer = composer;
 var depsMapper = exports.depsMapper = function depsMapper(_context2, actions) {
   return {
+    gotoEdit: function gotoEdit(translationId) {
+      if ((0, _isFunction3.default)(_context2.i18n.editTranslationAction)) {
+        // call function
+        _context2.i18n.editTranslationAction(translationId);
+      } else if ((0, _isString3.default)(_context2.i18n.editTranslationAction)) {
+        // call mantra action
+        (0, _invokeArgs3.default)(_context2.i18n.editTranslationAction, [translationId], actions);
+      }
+    },
     context: function context() {
       return _context2;
-    },
-    actions: actions
+    }
   };
 };
 
 var Component = function Component(_ref5) {
   var isEditMode = _ref5.isEditMode,
       gotoEdit = _ref5.gotoEdit,
+      translationId = _ref5.translationId,
       locale = _ref5.locale,
       _tagType = _ref5._tagType,
       _ref5$_props = _ref5._props,
@@ -198,8 +205,11 @@ var Component = function Component(_ref5) {
       cursor: isEditMode && 'pointer',
       textTransform: isEditMode && 'none'
     },
-    onClick: function onClick() {
-      return isEditMode && gotoEdit ? gotoEdit() : null;
+    onClick: function onClick(e) {
+      if (isEditMode && gotoEdit) {
+        e.preventDefault();
+        gotoEdit(translationId);
+      }
     }
   };
   return _react2.default.createElement(_tagType || 'span', (0, _extends3.default)({}, _props, editorProps, {
@@ -212,8 +222,8 @@ var Component = function Component(_ref5) {
 
 Component.displayName = 'T';
 
-var composeWithTrackerServerSave = (0, _get3.default)(global, 'Meteor.isServer') ? _mantraCore.compose : _mantraCore.composeWithTracker;
-var T = (0, _mantraCore.composeAll)(composeWithTrackerServerSave(composer), (0, _mantraCore.useDeps)(depsMapper))(Component);
+var composeWithTrackerServerSave = (0, _get3.default)('Meteor.isServer', global) ? _mantraCore.compose : _mantraCore.composeWithTracker;
+var T = (0, _mantraCore.composeAll)(composeWithTrackerServerSave(composer), (0, _mantraCore.useDeps)(depsMapper), _pure3.default)(Component);
 
 T.displayName = 'T';
 
