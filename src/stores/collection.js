@@ -11,8 +11,10 @@ export default class {
     ReactiveVar, // only needed on client
     collection,
     publicationName = 'translations',
+    Tracker,
     } = {}) {
     this.Ground = Ground;
+    this.Tracker = Tracker;
     this.publicationName = publicationName;
     this.collection = collection;
     this.Meteor = Meteor;
@@ -55,12 +57,14 @@ export default class {
     if (!locale || this.subscriptions[locale]) {
       return; // do not resubscribe;
     }
-    // we keep all old subscription, so no stop or tracker here
-    this.subscriptions[locale] = this.Meteor.subscribe(this.publicationName, locale, () => {
-      if (this.collectionGrounded) {
-        // reset and keep only new ones
-        this.collectionGrounded.keep(this.collection.find());
-      }
+    this.Tracker.nonreactive(() => {
+      // we keep all old subscription, so no stop or tracker here
+      this.subscriptions[locale] = this.Meteor.subscribe(this.publicationName, locale, () => {
+        if (this.collectionGrounded) {
+          // reset and keep only new ones
+          this.collectionGrounded.keep(this.collection.find());
+        }
+      });
     });
   }
 
@@ -71,6 +75,12 @@ export default class {
         this.ready();
         return null;
       }
+      if (this.disableMergebox) {
+        // with meteor add peerlibrary:control-mergebox
+        // disable mergebox, read more: https://github.com/meteor/meteor/issues/5645
+        this.disableMergebox();
+      }
+
       return that.collection.find({}, { fields: { [that.getValueKey(locale)]: true } });
     },
     );
