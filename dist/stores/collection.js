@@ -141,8 +141,9 @@ var _class = function () {
           return null;
         }
         if (this.disableMergebox) {
-          console.log('disable   this.disableMergebox();');
-          this.disableMergebox(); // with meteor add peerlibrary:control-mergebox
+          // with meteor add peerlibrary:control-mergebox
+          // disable mergebox, read more: https://github.com/meteor/meteor/issues/5645
+          this.disableMergebox();
         }
 
         return that.collection.find({}, { fields: (0, _defineProperty3.default)({}, that.getValueKey(locale), true) });
