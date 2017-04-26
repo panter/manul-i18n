@@ -66,11 +66,13 @@ var _class = function () {
         ReactiveVar = _ref.ReactiveVar,
         collection = _ref.collection,
         _ref$publicationName = _ref.publicationName,
-        publicationName = _ref$publicationName === undefined ? 'translations' : _ref$publicationName;
+        publicationName = _ref$publicationName === undefined ? 'translations' : _ref$publicationName,
+        Tracker = _ref.Tracker;
 
     (0, _classCallCheck3.default)(this, _class);
 
     this.Ground = Ground;
+    this.Tracker = Tracker;
     this.publicationName = publicationName;
     this.collection = collection;
     this.Meteor = Meteor;
@@ -119,12 +121,14 @@ var _class = function () {
       if (!locale || this.subscriptions[locale]) {
         return; // do not resubscribe;
       }
-      // we keep all old subscription, so no stop or tracker here
-      this.subscriptions[locale] = this.Meteor.subscribe(this.publicationName, locale, function () {
-        if (_this.collectionGrounded) {
-          // reset and keep only new ones
-          _this.collectionGrounded.keep(_this.collection.find());
-        }
+      this.Tracker.nonreactive(function () {
+        // we keep all old subscription, so no stop or tracker here
+        _this.subscriptions[locale] = _this.Meteor.subscribe(_this.publicationName, locale, function () {
+          if (_this.collectionGrounded) {
+            // reset and keep only new ones
+            _this.collectionGrounded.keep(_this.collection.find());
+          }
+        });
       });
     }
   }, {
@@ -136,6 +140,12 @@ var _class = function () {
           this.ready();
           return null;
         }
+        if (this.disableMergebox) {
+          // with meteor add peerlibrary:control-mergebox
+          // disable mergebox, read more: https://github.com/meteor/meteor/issues/5645
+          this.disableMergebox();
+        }
+
         return that.collection.find({}, { fields: (0, _defineProperty3.default)({}, that.getValueKey(locale), true) });
       });
     }
