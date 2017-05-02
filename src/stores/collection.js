@@ -11,6 +11,9 @@ export default class {
     ReactiveVar, // only needed on client
     collection,
     publicationName = 'translations',
+
+    // set to true if you are experience high loads. Translations will no longer be reactive if true
+    useMethod = false,
     Tracker,
     } = {}) {
     this.Ground = Ground;
@@ -19,6 +22,10 @@ export default class {
     this.collection = collection;
     this.Meteor = Meteor;
     this.ReactiveVar = ReactiveVar;
+    this.useMethod = useMethod;
+    if (this.useMethod && !Ground) {
+      throw new Error('please use ground-collection if using method calls');
+    }
 
     if (Meteor.isClient) {
       this.initClient();
@@ -48,7 +55,9 @@ export default class {
     this.subscriptions = {};
     if (this.Ground) {
       this.collectionGrounded = new this.Ground.Collection(`${this.collection._name}-grounded`);
-      this.collectionGrounded.observeSource(this.collection.find());
+      if (!this.useMethod) {
+        this.collectionGrounded.observeSource(this.collection.find());
+      }
     }
   }
 
@@ -57,28 +66,41 @@ export default class {
     if (!locale || this.subscriptions[locale]) {
       return; // do not resubscribe;
     }
-    this.Tracker.nonreactive(() => {
-      // we keep all old subscription, so no stop or tracker here
-      this.subscriptions[locale] = this.Meteor.subscribe(this.publicationName, locale, () => {
-        if (this.collectionGrounded) {
-          // reset and keep only new ones
-          this.collectionGrounded.keep(this.collection.find());
+    if (this.useMethod) {
+      this.subscriptions[locale] = true;
+      this.Meteor.call('_translations', locale, (error, translations) => {
+        if (!error) {
+          translations.forEach(
+            ({ _id, ...translation }) => (
+              this.getCollection().upsert({ _id }, { $set: translation })
+            ),
+          );
         }
       });
-    });
+    } else {
+      this.Tracker.nonreactive(() => {
+      // we keep all old subscription, so no stop or tracker here
+        this.subscriptions[locale] = this.Meteor.subscribe(this.publicationName, locale, () => {
+          if (this.collectionGrounded) {
+          // reset and keep only new ones
+            this.collectionGrounded.keep(this.collection.find());
+          }
+        });
+      });
+    }
   }
 
   initServer() {
     const that = this;
+    this.Meteor.methods({
+      _translations(locale) {
+        return that.collection.find({}, { fields: { [that.getValueKey(locale)]: true } }).fetch();
+      },
+    });
     this.Meteor.publish(this.publicationName, function publishTranslations(locale) {
       if (!locale) {
         this.ready();
         return null;
-      }
-      if (this.disableMergebox) {
-        // with meteor add peerlibrary:control-mergebox
-        // disable mergebox, read more: https://github.com/meteor/meteor/issues/5645
-        this.disableMergebox();
       }
 
       return that.collection.find({}, { fields: { [that.getValueKey(locale)]: true } });
@@ -115,7 +137,7 @@ export default class {
     const entryByKey = this._findEntryForKey(keyOrNamespace);
     if (entryByKey) {
       return this._getValue(entryByKey, _locale, params);
-    } else if (this.subscriptions[_locale].ready()) {
+    } else if (this.useMethod || this.subscriptions[_locale].ready()) {
       // try to find for namespace
       // this is expensive, so we do it only if subscription is ready
       const entries = this._findEntriesForNamespace(keyOrNamespace);
