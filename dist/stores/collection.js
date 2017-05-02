@@ -133,11 +133,15 @@ var _class = function () {
         this.subscriptions[locale] = true;
         this.Meteor.call('_translations', locale, function (error, translations) {
           if (!error) {
+            var usedIds = [];
             translations.forEach(function (_ref2) {
               var _id = _ref2._id,
                   translation = (0, _objectWithoutProperties3.default)(_ref2, ['_id']);
-              return _this.getCollection().upsert({ _id: _id }, { $set: translation });
+
+              _this.getCollection().upsert({ _id: _id }, { $set: translation });
+              usedIds.push(_id);
             });
+            _this.getCollection().remove({ _id: { $nin: usedIds } });
           }
         });
       } else {
