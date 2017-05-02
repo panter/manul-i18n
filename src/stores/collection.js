@@ -70,11 +70,14 @@ export default class {
       this.subscriptions[locale] = true;
       this.Meteor.call('_translations', locale, (error, translations) => {
         if (!error) {
+          const usedIds = [];
           translations.forEach(
-            ({ _id, ...translation }) => (
-              this.getCollection().upsert({ _id }, { $set: translation })
-            ),
+            ({ _id, ...translation }) => {
+              this.getCollection().upsert({ _id }, { $set: translation });
+              usedIds.push(_id);
+            },
           );
+          this.getCollection().remove({ _id: { $nin: usedIds } });
         }
       });
     } else {
