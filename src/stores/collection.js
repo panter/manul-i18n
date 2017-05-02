@@ -73,8 +73,13 @@ export default class {
           const usedIds = [];
           translations.forEach(
             ({ _id, ...translation }) => {
-              this.getCollection().upsert({ _id }, { $set: translation });
-              usedIds.push(_id);
+              try {
+                this.getCollection().upsert({ _id }, { $set: translation });
+                usedIds.push(_id);
+              } catch (e) {
+                // some upserts might throw error (if id is accidentaly an objectid)
+                console.log(e);
+              }
             },
           );
           this.getCollection().remove({ _id: { $nin: usedIds } });

@@ -138,8 +138,13 @@ var _class = function () {
               var _id = _ref2._id,
                   translation = (0, _objectWithoutProperties3.default)(_ref2, ['_id']);
 
-              _this.getCollection().upsert({ _id: _id }, { $set: translation });
-              usedIds.push(_id);
+              try {
+                _this.getCollection().upsert({ _id: _id }, { $set: translation });
+                usedIds.push(_id);
+              } catch (e) {
+                // some upserts might throw error (if id is accidentaly an objectid)
+                console.log(e);
+              }
             });
             _this.getCollection().remove({ _id: { $nin: usedIds } });
           }
