@@ -8,13 +8,13 @@ var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
-var _objectWithoutProperties2 = require('babel-runtime/helpers/objectWithoutProperties');
-
-var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
-
 var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
+var _objectWithoutProperties2 = require('babel-runtime/helpers/objectWithoutProperties');
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -67,6 +67,8 @@ var _class = function () {
         collection = _ref.collection,
         _ref$publicationName = _ref.publicationName,
         publicationName = _ref$publicationName === undefined ? 'translations' : _ref$publicationName,
+        _ref$useMethod = _ref.useMethod,
+        useMethod = _ref$useMethod === undefined ? false : _ref$useMethod,
         Tracker = _ref.Tracker;
 
     (0, _classCallCheck3.default)(this, _class);
@@ -77,6 +79,10 @@ var _class = function () {
     this.collection = collection;
     this.Meteor = Meteor;
     this.ReactiveVar = ReactiveVar;
+    this.useMethod = useMethod;
+    if (this.useMethod && !Ground) {
+      throw new Error('please use ground-collection if using method calls');
+    }
 
     if (Meteor.isClient) {
       this.initClient();
@@ -110,7 +116,9 @@ var _class = function () {
       this.subscriptions = {};
       if (this.Ground) {
         this.collectionGrounded = new this.Ground.Collection(this.collection._name + '-grounded');
-        this.collectionGrounded.observeSource(this.collection.find());
+        if (!this.useMethod) {
+          this.collectionGrounded.observeSource(this.collection.find());
+        }
       }
     }
   }, {
@@ -121,29 +129,42 @@ var _class = function () {
       if (!locale || this.subscriptions[locale]) {
         return; // do not resubscribe;
       }
-      this.Tracker.nonreactive(function () {
-        // we keep all old subscription, so no stop or tracker here
-        _this.subscriptions[locale] = _this.Meteor.subscribe(_this.publicationName, locale, function () {
-          if (_this.collectionGrounded) {
-            // reset and keep only new ones
-            _this.collectionGrounded.keep(_this.collection.find());
+      if (this.useMethod) {
+        this.subscriptions[locale] = true;
+        this.Meteor.call('_translations', locale, function (error, translations) {
+          if (!error) {
+            translations.forEach(function (_ref2) {
+              var _id = _ref2._id,
+                  translation = (0, _objectWithoutProperties3.default)(_ref2, ['_id']);
+              return _this.getCollection().upsert({ _id: _id }, { $set: translation });
+            });
           }
         });
-      });
+      } else {
+        this.Tracker.nonreactive(function () {
+          // we keep all old subscription, so no stop or tracker here
+          _this.subscriptions[locale] = _this.Meteor.subscribe(_this.publicationName, locale, function () {
+            if (_this.collectionGrounded) {
+              // reset and keep only new ones
+              _this.collectionGrounded.keep(_this.collection.find());
+            }
+          });
+        });
+      }
     }
   }, {
     key: 'initServer',
     value: function initServer() {
       var that = this;
+      this.Meteor.methods({
+        _translations: function _translations(locale) {
+          return that.collection.find({}, { fields: (0, _defineProperty3.default)({}, that.getValueKey(locale), true) }).fetch();
+        }
+      });
       this.Meteor.publish(this.publicationName, function publishTranslations(locale) {
         if (!locale) {
           this.ready();
           return null;
-        }
-        if (this.disableMergebox) {
-          // with meteor add peerlibrary:control-mergebox
-          // disable mergebox, read more: https://github.com/meteor/meteor/issues/5645
-          this.disableMergebox();
         }
 
         return that.collection.find({}, { fields: (0, _defineProperty3.default)({}, that.getValueKey(locale), true) });
@@ -189,12 +210,12 @@ var _class = function () {
       var entryByKey = this._findEntryForKey(keyOrNamespace);
       if (entryByKey) {
         return this._getValue(entryByKey, _locale, params);
-      } else if (this.subscriptions[_locale].ready()) {
+      } else if (this.useMethod || this.subscriptions[_locale].ready()) {
         // try to find for namespace
         // this is expensive, so we do it only if subscription is ready
         var entries = this._findEntriesForNamespace(keyOrNamespace);
-        var fullObject = (0, _flat.unflatten)((0, _flow3.default)((0, _sortBy3.default)(function (_ref2) {
-          var _id = _ref2._id;
+        var fullObject = (0, _flat.unflatten)((0, _flow3.default)((0, _sortBy3.default)(function (_ref3) {
+          var _id = _ref3._id;
           return _id.length;
         }), (0, _keyBy3.default)('_id'), (0, _mapValues3.default)(function (entry) {
           return _this2._getValue(entry, _locale, params);
