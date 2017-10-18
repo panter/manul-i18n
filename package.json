@@ -47,6 +47,7 @@
   },
   "main": "./dist/manul-i18n.js",
   "dependencies": {
+    "react-stubber": "^1.0.0",
     "manul-react-komposer": "0.0.3",
     "manul-mantra-core": "^1.7.x",
     "flat": "^2.0.1",
