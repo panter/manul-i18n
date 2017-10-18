@@ -41,9 +41,9 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _mantraCore = require('mantra-core');
+var _manulMantraCore = require('manul-mantra-core');
 
-var _reactKomposer = require('react-komposer');
+var _manulReactKomposer = require('manul-react-komposer');
 
 var _i18n_service = require('./i18n_service');
 
@@ -222,12 +222,12 @@ var Component = function Component(_ref5) {
 
 Component.displayName = 'T';
 
-var composeWithTrackerServerSave = (0, _get3.default)('Meteor.isServer', global) ? _mantraCore.compose : _mantraCore.composeWithTracker;
-var T = (0, _mantraCore.composeAll)(composeWithTrackerServerSave(composer), (0, _mantraCore.useDeps)(depsMapper), _pure3.default)(Component);
+var composeWithTrackerServerSave = (0, _get3.default)('Meteor.isServer', global) ? _manulMantraCore.compose : _manulMantraCore.composeWithTracker;
+var T = (0, _manulMantraCore.composeAll)(composeWithTrackerServerSave(composer), (0, _manulMantraCore.useDeps)(depsMapper), _pure3.default)(Component);
 
 T.displayName = 'T';
 
-(0, _reactKomposer.setComposerStub)(T, function (props) {
+(0, _manulReactKomposer.setComposerStub)(T, function (props) {
   var stubContext = function stubContext() {
     return {
       i18n: new _i18n_service2.default({

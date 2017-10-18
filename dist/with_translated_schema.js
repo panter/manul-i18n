@@ -21,7 +21,7 @@ var _isFunction2 = require('lodash/isFunction');
 
 var _isFunction3 = _interopRequireDefault(_isFunction2);
 
-var _mantraCore = require('mantra-core');
+var _manulMantraCore = require('manul-mantra-core');
 
 var _translate_simple_schema = require('./translate_simple_schema');
 
@@ -77,6 +77,6 @@ var composer = function composer(mappingArrayOrFunction) {
 exports.composer = composer;
 
 exports.default = function (mapping) {
-  return (0, _mantraCore.composeWithTracker)(composer(mapping));
+  return (0, _manulMantraCore.composeWithTracker)(composer(mapping));
 };
 //# sourceMappingURL=with_translated_schema.js.map

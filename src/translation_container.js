@@ -1,8 +1,8 @@
 import React from 'react';
 import { get, noop, isString, isFunction, invokeArgs } from 'lodash/fp';
 import { pure } from 'recompose';
-import { useDeps, composeAll, composeWithTracker, compose } from 'mantra-core';
-import { setComposerStub } from 'react-komposer';
+import { useDeps, composeAll, composeWithTracker, compose } from 'manul-mantra-core';
+import { setComposerStub } from 'manul-react-komposer';
 import I18nService from './i18n_service';
 
 
