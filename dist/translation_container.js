@@ -41,7 +41,7 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _manulMantraCore = require('manul-mantra-core');
+var _mantraCore = require('@storybook/mantra-core');
 
 var _reactStubber = require('react-stubber');
 
@@ -226,8 +226,8 @@ var Component = function Component(_ref5) {
 
 Component.displayName = 'T';
 
-var composeWithTrackerServerSave = (0, _get3.default)('Meteor.isServer', global) ? _manulMantraCore.compose : _composeWithTracker2.default;
-var T = (0, _manulMantraCore.composeAll)(composeWithTrackerServerSave(composer), (0, _manulMantraCore.useDeps)(depsMapper), _pure3.default)(Component);
+var composeWithTrackerServerSave = (0, _get3.default)('Meteor.isServer', global) ? _mantraCore.compose : _composeWithTracker2.default;
+var T = (0, _mantraCore.composeAll)(composeWithTrackerServerSave(composer), (0, _mantraCore.useDeps)(depsMapper), _pure3.default)(Component);
 
 T.displayName = 'T';
 

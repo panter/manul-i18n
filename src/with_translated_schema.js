@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { composeWithTracker } from 'manul-mantra-core';
+import { composeWithTracker } from '@storybook/mantra-core';
 
 import translateSimpleSchema from './translate_simple_schema';
 import translateSimpleSchemaLegacy from './translate_simple_schema_1';

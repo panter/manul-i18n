@@ -1,7 +1,7 @@
 import React from 'react';
 import { get, noop, isString, isFunction, invokeArgs } from 'lodash/fp';
 import { pure } from 'recompose';
-import { useDeps, composeAll, compose } from 'manul-mantra-core';
+import { useDeps, composeAll, compose } from '@storybook/mantra-core';
 import { mayBeStubbed } from 'react-stubber';
 import composeWithTracker from './utils/composeWithTracker';
 import I18nService from './i18n_service';
