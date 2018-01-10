@@ -1,8 +1,9 @@
 import React from 'react';
 import { get, noop, isString, isFunction, invokeArgs } from 'lodash/fp';
 import { pure } from 'recompose';
-import { useDeps, composeAll, composeWithTracker, compose } from 'mantra-core';
-import { setComposerStub } from 'react-komposer';
+import { useDeps, composeAll, compose } from '@storybook/mantra-core';
+import { mayBeStubbed } from 'react-stubber';
+import composeWithTracker from './utils/composeWithTracker';
 import I18nService from './i18n_service';
 
 
@@ -159,7 +160,7 @@ const T = composeAll(
 
 T.displayName = 'T';
 
-setComposerStub(T, (props) => {
+mayBeStubbed(T, (props) => {
   const stubContext = () => ({
     i18n: new I18nService({
       translationStore: {
