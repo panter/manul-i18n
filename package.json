@@ -14,11 +14,12 @@
   },
   "bugs": "https://github.com/panter/manul-i18n/issues",
   "peerDependencies": {
+    "@storybook/mantra-core": "*",
+    "@storybook/react-komposer": "*",
     "babel-runtime": "*",
     "lodash": "*",
-    "mantra-core": "*",
     "react": "*",
-    "react-komposer": "*",
+    "react-stubber": "*",
     "recompose": "*",
     "simpl-schema": "*"
   },
@@ -33,6 +34,7 @@
     "babel-preset-stage-2": "6.x.x",
     "eslint": "^3.12.2",
     "eslint-config-airbnb": "^13.0.0",
+    "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-meteor": "^4.0.1",

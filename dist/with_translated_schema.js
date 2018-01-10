@@ -21,7 +21,7 @@ var _isFunction2 = require('lodash/isFunction');
 
 var _isFunction3 = _interopRequireDefault(_isFunction2);
 
-var _mantraCore = require('mantra-core');
+var _mantraCore = require('@storybook/mantra-core');
 
 var _translate_simple_schema = require('./translate_simple_schema');
 
