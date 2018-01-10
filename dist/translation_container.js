@@ -13,6 +13,10 @@ var _objectWithoutProperties2 = require('babel-runtime/helpers/objectWithoutProp
 
 var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
 
+var _pure2 = require('recompose/pure');
+
+var _pure3 = _interopRequireDefault(_pure2);
+
 var _invokeArgs2 = require('lodash/fp/invokeArgs');
 
 var _invokeArgs3 = _interopRequireDefault(_invokeArgs2);
@@ -36,8 +40,6 @@ var _get3 = _interopRequireDefault(_get2);
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
-
-var _recompose = require('recompose');
 
 var _mantraCore = require('@storybook/mantra-core');
 
@@ -226,7 +228,7 @@ var Component = function Component(_ref5) {
 Component.displayName = 'T';
 
 var composeWithTrackerServerSave = (0, _get3.default)('Meteor.isServer', global) ? _mantraCore.compose : _composeWithTracker2.default;
-var T = (0, _mantraCore.composeAll)(composeWithTrackerServerSave(composer), (0, _mantraCore.useDeps)(depsMapper), _recompose.pure)(Component);
+var T = (0, _mantraCore.composeAll)(composeWithTrackerServerSave(composer), (0, _mantraCore.useDeps)(depsMapper), _pure3.default)(Component);
 
 T.displayName = 'T';
 

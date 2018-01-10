@@ -14,9 +14,9 @@
   },
   "bugs": "https://github.com/panter/manul-i18n/issues",
   "peerDependencies": {
+    "@babel/runtime": "*",
     "@storybook/mantra-core": "*",
     "@storybook/react-komposer": "*",
-    "babel-runtime": "*",
     "lodash": "*",
     "react": "*",
     "react-stubber": "*",
@@ -50,6 +50,10 @@
   },
   "main": "./dist/manul-i18n.js",
   "dependencies": {
-    "flat": "^2.0.1"
+    "@storybook/mantra-core": "^1.7.2",
+    "flat": "^2.0.1",
+    "react": "^16.2.0",
+    "react-stubber": "^1.0.0",
+    "recompose": "^0.26.0"
   }
 }

@@ -7,6 +7,8 @@ exports.default = composeWithTracker;
 
 var _reactKomposer = require('@storybook/react-komposer');
 
+var myCompose = (0, _reactKomposer.setDefaults)({ withRef: false });
+
 function composeWithTracker(reactiveFn, L, E, options) {
   var onPropsChange = function onPropsChange(props, onData, context) {
     var trackerCleanup = void 0;
@@ -23,7 +25,6 @@ function composeWithTracker(reactiveFn, L, E, options) {
       return handler.stop();
     };
   };
-
-  return (0, _reactKomposer.compose)(onPropsChange, L, E, options);
+  return myCompose(onPropsChange, L, E, options);
 }
 //# sourceMappingURL=composeWithTracker.js.map
