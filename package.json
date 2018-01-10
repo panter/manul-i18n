@@ -1,7 +1,7 @@
 {
   "name": "@panter/manul-i18n",
   "description": "",
-  "version": "0.5.0beta-3",
+  "version": "0.6.0",
   "author": {
     "name": "Marco Wettstein",
     "email": "maw@panter.ch",
@@ -14,12 +14,14 @@
   },
   "bugs": "https://github.com/panter/manul-i18n/issues",
   "peerDependencies": {
-    "babel-runtime": "*.*.*",
-    "lodash": "^4.0.0",
-    "mantra-core": "^1.7.0",
-    "react": "^15.0.0",
-    "react-komposer": "^1.0.0",
-    "simpl-schema": "^0.2.0"
+    "@babel/runtime": "*",
+    "@storybook/mantra-core": "*",
+    "@storybook/react-komposer": "*",
+    "lodash": "*",
+    "react": "*",
+    "react-stubber": "*",
+    "recompose": "*",
+    "simpl-schema": "*"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
@@ -32,6 +34,7 @@
     "babel-preset-stage-2": "6.x.x",
     "eslint": "^3.12.2",
     "eslint-config-airbnb": "^13.0.0",
+    "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-meteor": "^4.0.1",
@@ -40,14 +43,17 @@
     "tape": "^4.2.2"
   },
   "scripts": {
-    "prepublish": "npm run compile",
+    "prepublish": "yarn run compile",
     "test": "babel-node --stage 1 test/harness.js test/**/*.js",
-    "compile": "npm run lint && babel src -s -d dist",
+    "compile": "yarn run lint && babel src -s -d dist",
     "lint": "eslint src/**.js"
   },
   "main": "./dist/manul-i18n.js",
   "dependencies": {
+    "@storybook/mantra-core": "^1.7.2",
     "flat": "^2.0.1",
-    "recompose": "^0.21.0"
+    "react": "^16.2.0",
+    "react-stubber": "^1.0.0",
+    "recompose": "^0.26.0"
   }
 }

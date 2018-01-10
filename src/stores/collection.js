@@ -145,7 +145,7 @@ export default class {
     const entryByKey = this._findEntryForKey(keyOrNamespace);
     if (entryByKey) {
       return this._getValue(entryByKey, _locale, params);
-    } else if (this.useMethod || this.subscriptions[_locale].ready()) {
+    } else if (this.useMethod || this.Meteor.isServer || this.subscriptions[_locale].ready()) {
       // try to find for namespace
       // this is expensive, so we do it only if subscription is ready
       const entries = this._findEntriesForNamespace(keyOrNamespace);

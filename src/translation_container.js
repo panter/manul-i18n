@@ -1,10 +1,11 @@
 import React from 'react';
 import { get, noop, isString, isFunction, invokeArgs } from 'lodash/fp';
 import { pure } from 'recompose';
-import { useDeps, composeAll, composeWithTracker, compose } from 'mantra-core';
-import { setComposerStub } from 'react-komposer';
-import I18nService from './i18n_service';
+import { useDeps, composeAll, compose } from '@storybook/mantra-core';
+import { mayBeStubbed } from 'react-stubber';
 
+import composeWithTracker from './utils/composeWithTracker';
+import I18nService from './i18n_service';
 
 /**
 
@@ -71,11 +72,13 @@ import I18nService from './i18n_service';
 
 **/
 
-const getTranslationId = ({ children, _id }) => (
-  _id || (isString(children) ? children : null)
-);
+const getTranslationId = ({ children, _id }) =>
+  _id || (isString(children) ? children : null);
 
-const getTranslation = (i18n, { doc, _id, disableEditorBypass, children, ...params }) => {
+const getTranslation = (
+  i18n,
+  { doc, _id, disableEditorBypass, children, ...params }
+) => {
   const translationId = getTranslationId({ children, _id });
   if (doc) {
     return i18n.tDoc(doc, translationId);
@@ -108,7 +111,7 @@ export const composer = ({ context, ...props }, onData) => {
 };
 
 export const depsMapper = (context, actions) => ({
-  gotoEdit: (translationId) => {
+  gotoEdit: translationId => {
     if (isFunction(context.i18n.editTranslationAction)) {
       // call function
       context.i18n.editTranslationAction(translationId);
@@ -117,59 +120,69 @@ export const depsMapper = (context, actions) => ({
       invokeArgs(context.i18n.editTranslationAction, [translationId], actions);
     }
   },
-  context: () => context,
+  context: () => context
 });
 
-const Component = (
-  { isEditMode, gotoEdit, translationId, locale, _tagType, _props = {}, translation, children },
-) => {
+const Component = ({
+  isEditMode,
+  gotoEdit,
+  translationId,
+  locale,
+  _tagType,
+  _props = {},
+  translation,
+  children
+}) => {
   if (isFunction(children)) {
     return children(translation);
   }
+
   const editorProps = {
     style: {
       cursor: isEditMode && 'pointer',
-      textTransform: isEditMode && 'none',
+      textTransform: isEditMode && 'none'
     },
-    onClick: (e) => {
+    onClick: e => {
       if (isEditMode && gotoEdit) {
         e.preventDefault();
         gotoEdit(translationId);
       }
-    },
+    }
   };
   return React.createElement(_tagType || 'span', {
     ..._props,
     ...editorProps,
     dangerouslySetInnerHTML: {
-      __html: translation,
+      __html: translation
     },
-    key: locale,
+    key: locale
   });
 };
 
 Component.displayName = 'T';
 
-const composeWithTrackerServerSave = get('Meteor.isServer', global) ? compose : composeWithTracker;
+const composeWithTrackerServerSave = get('Meteor.isServer', global)
+  ? compose
+  : composeWithTracker;
 const T = composeAll(
   composeWithTrackerServerSave(composer),
   useDeps(depsMapper),
-  pure,
+  pure
 )(Component);
 
 T.displayName = 'T';
 
-setComposerStub(T, (props) => {
+mayBeStubbed(T, props => {
   const stubContext = () => ({
     i18n: new I18nService({
       translationStore: {
         setLocale: noop,
         getLocale: () => 'de',
-        translate: key => key,
+        translate: key => key
       },
       supportedLocales: ['de'],
-      defaultLocale: 'de',
-    }),
+      defaultLocale: 'de'
+    })
   });
   return getTranslationProps(stubContext, props);
 });

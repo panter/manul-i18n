@@ -41,9 +41,13 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _mantraCore = require('mantra-core');
+var _mantraCore = require('@storybook/mantra-core');
 
-var _reactKomposer = require('react-komposer');
+var _reactStubber = require('react-stubber');
+
+var _composeWithTracker = require('./utils/composeWithTracker');
+
+var _composeWithTracker2 = _interopRequireDefault(_composeWithTracker);
 
 var _i18n_service = require('./i18n_service');
 
@@ -200,6 +204,7 @@ var Component = function Component(_ref5) {
   if ((0, _isFunction3.default)(children)) {
     return children(translation);
   }
+
   var editorProps = {
     style: {
       cursor: isEditMode && 'pointer',
@@ -222,12 +227,12 @@ var Component = function Component(_ref5) {
 
 Component.displayName = 'T';
 
-var composeWithTrackerServerSave = (0, _get3.default)('Meteor.isServer', global) ? _mantraCore.compose : _mantraCore.composeWithTracker;
+var composeWithTrackerServerSave = (0, _get3.default)('Meteor.isServer', global) ? _mantraCore.compose : _composeWithTracker2.default;
 var T = (0, _mantraCore.composeAll)(composeWithTrackerServerSave(composer), (0, _mantraCore.useDeps)(depsMapper), _pure3.default)(Component);
 
 T.displayName = 'T';
 
-(0, _reactKomposer.setComposerStub)(T, function (props) {
+(0, _reactStubber.mayBeStubbed)(T, function (props) {
   var stubContext = function stubContext() {
     return {
       i18n: new _i18n_service2.default({

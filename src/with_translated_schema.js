@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { composeWithTracker } from 'mantra-core';
 
+import composeWithTracker from './utils/composeWithTracker';
 import translateSimpleSchema from './translate_simple_schema';
 import translateSimpleSchemaLegacy from './translate_simple_schema_1';
 /**
@@ -10,7 +10,10 @@ import translateSimpleSchemaLegacy from './translate_simple_schema_1';
 
   e.g. withTranslatedSchema({companySchema: "companies"})
 */
-export const composer = mappingArrayOrFunction => ({ context, ...props }, onData) => {
+export const composer = mappingArrayOrFunction => (
+  { context, ...props },
+  onData
+) => {
   const { i18n } = context();
 
   let SimpleSchema;
@@ -20,27 +23,28 @@ export const composer = mappingArrayOrFunction => ({ context, ...props }, onData
     /* eslint import/no-unresolved: 0 */
     SimpleSchema = require('simpl-schema').default;
   } catch (e) {
-  // load from context
+    // load from context
     SimpleSchema = context().SimpleSchema;
   }
   if (!SimpleSchema) {
-    throw new Error('Please provice SimpleSchema as npm module (recomended) or in context to use withTranslatedSchema');
+    throw new Error(
+      'Please provice SimpleSchema as npm module (recomended) or in context to use withTranslatedSchema'
+    );
   }
 
   let mapping = mappingArrayOrFunction;
   if (_.isFunction(mappingArrayOrFunction)) {
     mapping = mappingArrayOrFunction({ context, ...props });
   }
-  const translateSimpleSchemaFunc = (
-    SimpleSchema.version === 2 ?
-    translateSimpleSchema :
-    translateSimpleSchemaLegacy
-  );
-  const translatedProps = _.mapValues(
-    mapping,
-    (namespace, propName) => (
-      translateSimpleSchemaFunc({ i18n, SimpleSchema })(props[propName], namespace)
-    ),
+  const translateSimpleSchemaFunc =
+    SimpleSchema.version === 2
+      ? translateSimpleSchema
+      : translateSimpleSchemaLegacy;
+  const translatedProps = _.mapValues(mapping, (namespace, propName) =>
+    translateSimpleSchemaFunc({ i18n, SimpleSchema })(
+      props[propName],
+      namespace
+    )
   );
   onData(null, { ...props, ...translatedProps });
 };

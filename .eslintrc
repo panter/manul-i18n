@@ -10,18 +10,29 @@
     }
   },
 
-  "plugins": [
-    "meteor",
-    "react"
-  ],
+  "plugins": ["meteor", "react"],
   "extends": [
     "airbnb",
     "plugin:meteor/recommended",
-    "plugin:react/recommended"
+    "plugin:react/recommended",
+      "prettier"
   ],
   "rules": {
     "arrow-body-style": [1, "as-needed"],
     "no-underscore-dangle": 0,
-    "react/prop-types": 0
+    "react/prop-types": 0,
+    "import/extensions": 0,
+    "import/no-unresolved": [
+      "error",
+      {
+        "ignore": [
+          "^react$",
+          "^react-stubber$",
+          "^@storybook/mantra-core$",
+          "^@storybook/react-komposer$",
+          "^recompose$"
+        ]
+      }
+    ]
   }
 }
