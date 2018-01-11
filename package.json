@@ -24,6 +24,7 @@
     "simpl-schema": "*"
   },
   "devDependencies": {
+    "@storybook/mantra-core": "^1.7.2",
     "babel-cli": "^6.24.0",
     "babel-eslint": "^6.1.2",
     "babel-plugin-lodash": "^3.2.11",
@@ -40,6 +41,9 @@
     "eslint-plugin-meteor": "^4.0.1",
     "eslint-plugin-react": "^6.8.0",
     "glob": "^5.0.15",
+    "react": "^16.2.0",
+    "react-stubber": "^1.0.0",
+    "recompose": "^0.26.0",
     "tape": "^4.2.2",
     "watch": "^1.0.2"
   },
@@ -52,10 +56,6 @@
   },
   "main": "./dist/manul-i18n.js",
   "dependencies": {
-    "@storybook/mantra-core": "^1.7.2",
-    "flat": "^2.0.1",
-    "react": "^16.2.0",
-    "react-stubber": "^1.0.0",
-    "recompose": ">=0.21.2"
+    "flat": "^2.0.1"
   }
 }
