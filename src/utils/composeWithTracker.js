@@ -1,7 +1,7 @@
 import { setDefaults } from '@storybook/react-komposer';
 
 const myCompose = setDefaults({ withRef: false });
-
+/* global Tracker */
 export default function composeWithTracker(reactiveFn, L, E, options) {
   const onPropsChange = (props, onData, context) => {
     let trackerCleanup;

@@ -1,7 +1,7 @@
 {
   "name": "@panter/manul-i18n",
   "description": "",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "author": {
     "name": "Marco Wettstein",
     "email": "maw@panter.ch",
@@ -54,6 +54,6 @@
     "flat": "^2.0.1",
     "react": "^16.2.0",
     "react-stubber": "^1.0.0",
-    "recompose": "^0.26.0"
+    "recompose": ">=0.21.2"
   }
 }
