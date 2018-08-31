@@ -73,6 +73,11 @@ exports.default = function (_ref) {
         if (schema.objectKeys(fullFieldName).length > 0) {
           _translateSchemaObject(fullFieldName, fieldTranslations);
         }
+        // or if array
+
+        if (schema.objectKeys(fullFieldName + '.$').length > 0) {
+          _translateSchemaObject(fullFieldName + '.$', fieldTranslations);
+        }
       });
     };
     _translateSchemaObject(null, translations);

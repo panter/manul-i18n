@@ -8,7 +8,7 @@ exports.default = composeWithTracker;
 var _reactKomposer = require('@storybook/react-komposer');
 
 var myCompose = (0, _reactKomposer.setDefaults)({ withRef: false });
-
+/* global Tracker */
 function composeWithTracker(reactiveFn, L, E, options) {
   var onPropsChange = function onPropsChange(props, onData, context) {
     var trackerCleanup = void 0;
