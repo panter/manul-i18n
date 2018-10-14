@@ -1,9 +1,18 @@
 import { setDefaults } from '@storybook/react-komposer';
 
-const myCompose = setDefaults({ withRef: false });
-/* global Tracker */
-export default function composeWithTracker(reactiveFn, L, E, options) {
+const myCompose = setDefaults({
+  pure: true,
+  withRef: false,
+});
+
+/* global Tracker, Meteor */
+
+export default function composeWithTracker(reactiveFn, options) {
   const onPropsChange = (props, onData, context) => {
+    if (Meteor.isServer) {
+      reactiveFn(props, onData, context);
+      return () => null
+    }
     let trackerCleanup;
     const handler = Tracker.nonreactive(() =>
       Tracker.autorun(() => {
@@ -17,6 +26,11 @@ export default function composeWithTracker(reactiveFn, L, E, options) {
       }
       return handler.stop();
     };
+
   };
-  return myCompose(onPropsChange, L, E, options);
+
+  return myCompose(
+    onPropsChange,
+    options
+  );
 }

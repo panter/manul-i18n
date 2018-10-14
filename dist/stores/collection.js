@@ -58,6 +58,26 @@ var _flat2 = _interopRequireDefault(_flat);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var NonReactiveVar = function () {
+  function NonReactiveVar() {
+    (0, _classCallCheck3.default)(this, NonReactiveVar);
+    this._value = null;
+  }
+
+  (0, _createClass3.default)(NonReactiveVar, [{
+    key: 'set',
+    value: function set(value) {
+      this._value = value;
+    }
+  }, {
+    key: 'get',
+    value: function get() {
+      return this._value;
+    }
+  }]);
+  return NonReactiveVar;
+}();
+
 var _class = function () {
   function _class() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -80,10 +100,11 @@ var _class = function () {
     this.Meteor = Meteor;
     this.ReactiveVar = ReactiveVar;
     this.useMethod = useMethod;
+    this.subscriptions = {};
     if (this.useMethod && !Ground) {
       throw new Error('please use ground-collection if using method calls');
     }
-
+    this.locale = this.Meteor.isServer ? new NonReactiveVar() : new this.ReactiveVar();
     if (Meteor.isClient) {
       this.initClient();
     } else {
@@ -94,26 +115,17 @@ var _class = function () {
   (0, _createClass3.default)(_class, [{
     key: 'getLocale',
     value: function getLocale() {
-      if (this.Meteor.isServer) {
-        console.trace('getLocale can only be called on the client, pass _locale to translate if using from server');
-        throw new this.Meteor.Error('getLocale can only be called on the client');
-      }
       return this.locale.get();
     }
   }, {
     key: 'setLocale',
     value: function setLocale(locale) {
-      if (this.Meteor.isServer) {
-        throw new this.Meteor.Error('setLocale can only be called on the client');
-      }
       this.locale.set(locale);
       this.startSubscription(locale); // restart
     }
   }, {
     key: 'initClient',
     value: function initClient() {
-      this.locale = new this.ReactiveVar();
-      this.subscriptions = {};
       if (this.Ground) {
         this.collectionGrounded = new this.Ground.Collection(this.collection._name + '-grounded');
         if (!this.useMethod) {
@@ -126,6 +138,9 @@ var _class = function () {
     value: function startSubscription(locale) {
       var _this = this;
 
+      if (this.Meteor.isServer) {
+        return;
+      }
       if (!locale || this.subscriptions[locale]) {
         return; // do not resubscribe;
       }
@@ -217,24 +232,27 @@ var _class = function () {
       }
 
       var entryByKey = this._findEntryForKey(keyOrNamespace);
+
       if (entryByKey) {
         return this._getValue(entryByKey, _locale, params);
-      } else if (this.useMethod || this.Meteor.isServer || this.subscriptions[_locale].ready()) {
-        // try to find for namespace
-        // this is expensive, so we do it only if subscription is ready
-        var entries = this._findEntriesForNamespace(keyOrNamespace);
-        var fullObject = (0, _flat.unflatten)((0, _flow3.default)((0, _sortBy3.default)(function (_ref3) {
-          var _id = _ref3._id;
-          return _id.length;
-        }), (0, _keyBy3.default)('_id'), (0, _mapValues3.default)(function (entry) {
-          return _this2._getValue(entry, _locale, params);
-        }))(entries), { overwrite: true });
-        var objectForNamespace = (0, _get3.default)(fullObject, keyOrNamespace);
-        if ((0, _isEmpty3.default)(objectForNamespace)) {
-          return null;
+      } else if (this.useMethod || this.Meteor.isServer || this.Meteor.isClient
+      // || this.subscriptions[_locale].ready()
+      ) {
+          // try to find for namespace
+          // this is expensive, so we do it only if subscription is ready
+          var entries = this._findEntriesForNamespace(keyOrNamespace);
+          var fullObject = (0, _flat.unflatten)((0, _flow3.default)((0, _sortBy3.default)(function (_ref3) {
+            var _id = _ref3._id;
+            return _id.length;
+          }), (0, _keyBy3.default)('_id'), (0, _mapValues3.default)(function (entry) {
+            return _this2._getValue(entry, _locale, params);
+          }))(entries), { overwrite: true });
+          var objectForNamespace = (0, _get3.default)(fullObject, keyOrNamespace);
+          if ((0, _isEmpty3.default)(objectForNamespace)) {
+            return null;
+          }
+          return objectForNamespace;
         }
-        return objectForNamespace;
-      }
       return null;
     }
   }, {

@@ -141,7 +141,9 @@ var I18nClient = function () {
       }
       var fallbackLocale = this.getFallbackLocale();
       if ((useFallbackForMissing || this.useFallbackForMissing) && this.getLocale() !== fallbackLocale) {
-        translation = this.translationStore.translate(keyOrNamespace, (0, _extends3.default)({}, props, { _locale: fallbackLocale }));
+        translation = this.translationStore.translate(keyOrNamespace, (0, _extends3.default)({}, props, {
+          _locale: fallbackLocale
+        }));
       }
       // if still nil and is editor, return key if allowed
       if (!(0, _isNil3.default)(translation)) {

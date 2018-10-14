@@ -6,9 +6,7 @@ i18n.t(key, props): translate the given key (caution: only reactive in tracker-k
 **/
 import _ from 'lodash';
 
-
 class I18nClient {
-
   constructor({
     translationStore, // mandatory
     supportedLocales = ['en'],
@@ -23,7 +21,7 @@ class I18nClient {
     // also, if you click on one of your translations (via T),
     // editTranslationAction will be called
     isEditMode = () => false,
-    editTranslationAction = (translationId) => {
+    editTranslationAction = translationId => {
       /* eslint no-console: 0*/
       console.log('define editTranslationAction in I18nConstructor');
       console.log('you can define a mantra-action (string)');
@@ -33,8 +31,8 @@ class I18nClient {
     // shouldShowKeysAsFallback defines whether it should show the keys of translation
     // if the translation is not available (can also be reactive datasource)
     // this is usefull for admins and/or in development-environement
-    shouldShowKeysAsFallback = () => false,
-    }) {
+    shouldShowKeysAsFallback = () => false
+  }) {
     this.translationStore = translationStore;
     this.isEditMode = isEditMode;
     this.shouldShowKeysAsFallback = shouldShowKeysAsFallback;
@@ -66,13 +64,15 @@ class I18nClient {
     return this.tKey(key, ...args);
   }
 
-  tKey(keyOrNamespace, props,
+  tKey(
+    keyOrNamespace,
+    props,
     {
       useFallbackForMissing = false,
       showKeyForMissing = false,
       disableEditorBypass = false,
-      nullKeyValue = '! no translationId given !',
-     } = {},
+      nullKeyValue = '! no translationId given !'
+    } = {}
   ) {
     if (!keyOrNamespace) {
       return nullKeyValue;
@@ -89,11 +89,12 @@ class I18nClient {
       (useFallbackForMissing || this.useFallbackForMissing) &&
       this.getLocale() !== fallbackLocale
     ) {
-      translation = this.translationStore.translate(
-          keyOrNamespace, { ...props, _locale: fallbackLocale },
-        );
+      translation = this.translationStore.translate(keyOrNamespace, {
+        ...props,
+        _locale: fallbackLocale
+      });
     }
-      // if still nil and is editor, return key if allowed
+    // if still nil and is editor, return key if allowed
     if (!_.isNil(translation)) {
       return translation;
     } else if (showKeyForMissing || this.shouldShowKeysAsFallback()) {
@@ -149,7 +150,6 @@ class I18nClient {
     return this.defaultLocale;
   }
 
-
   setLocale(locale) {
     const fallbackLocale = this.getFallbackLocale(locale);
     this.translationStore.setLocale(fallbackLocale);
@@ -166,8 +166,6 @@ class I18nClient {
   onChangeLocale(callback) {
     this.changeCallbacks.push(callback);
   }
-
 }
-
 
 export default I18nClient;
