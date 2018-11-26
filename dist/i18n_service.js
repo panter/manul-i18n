@@ -8,10 +8,6 @@ var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
 
 var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -55,6 +51,7 @@ var I18nClient = function () {
         supportedLocales = _ref$supportedLocales === undefined ? ['en'] : _ref$supportedLocales,
         _ref$defaultLocale = _ref.defaultLocale,
         defaultLocale = _ref$defaultLocale === undefined ? 'en' : _ref$defaultLocale,
+        stateDict = _ref.stateDict,
         _ref$useFallbackForMi = _ref.useFallbackForMissing,
         useFallbackForMissing = _ref$useFallbackForMi === undefined ? true : _ref$useFallbackForMi,
         _ref$isEditMode = _ref.isEditMode,
@@ -83,7 +80,11 @@ var I18nClient = function () {
     this.supportedLocales = supportedLocales;
     this.defaultLocale = defaultLocale;
     this.changeCallbacks = [];
-    this.setLocale(defaultLocale);
+
+    if (!stateDict) {
+      throw new Error('please pass stateDict to i18nstore, which has the set/get like a Map. Usually you use ReactiveDict for that');
+    }
+    this.stateDict = stateDict;
   }
   /**
      NEW: if param is an array, it will return the first that exists (in any language)
@@ -135,15 +136,13 @@ var I18nClient = function () {
       if (!disableEditorBypass && this.isEditMode()) {
         return keyOrNamespace;
       }
-      var translation = this.translationStore.translate(keyOrNamespace, props);
+      var translation = this.translationStore.translate(this.getLocale(), keyOrNamespace, props);
       if (!(0, _isNil3.default)(translation)) {
         return translation;
       }
       var fallbackLocale = this.getFallbackLocale();
       if ((useFallbackForMissing || this.useFallbackForMissing) && this.getLocale() !== fallbackLocale) {
-        translation = this.translationStore.translate(keyOrNamespace, (0, _extends3.default)({}, props, {
-          _locale: fallbackLocale
-        }));
+        translation = this.translationStore.translate(fallbackLocale, keyOrNamespace, props);
       }
       // if still nil and is editor, return key if allowed
       if (!(0, _isNil3.default)(translation)) {
@@ -220,7 +219,7 @@ var I18nClient = function () {
     key: 'setLocale',
     value: function setLocale(locale) {
       var fallbackLocale = this.getFallbackLocale(locale);
-      this.translationStore.setLocale(fallbackLocale);
+      this.stateDict.set('locale', fallbackLocale);
       this.changeCallbacks.forEach(function (callback) {
         return callback(fallbackLocale);
       });
@@ -228,7 +227,7 @@ var I18nClient = function () {
   }, {
     key: 'getLocale',
     value: function getLocale() {
-      return this.translationStore.getLocale();
+      return this.getFallbackLocale(this.stateDict.get('locale'));
     }
   }, {
     key: 'getSupportedLocales',

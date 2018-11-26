@@ -4,13 +4,14 @@ available in context as i18n.
 i18n.t(key, props): translate the given key (caution: only reactive in tracker-komposer)
 
 **/
-import _ from 'lodash';
+import _ from 'lodash'
 
 class I18nClient {
   constructor({
     translationStore, // mandatory
     supportedLocales = ['en'],
     defaultLocale = 'en',
+    stateDict, // stores current data, because this is designed to be a singleton
     // whether it should use fallback locale if translation is missing
     // the rule is the following: xx_XX --> xx --> defaultLocale
     useFallbackForMissing = true,
@@ -23,25 +24,31 @@ class I18nClient {
     isEditMode = () => false,
     editTranslationAction = translationId => {
       /* eslint no-console: 0*/
-      console.log('define editTranslationAction in I18nConstructor');
-      console.log('you can define a mantra-action (string)');
-      console.log('or you can define a function');
-      console.log(`would edit ${translationId}`);
+      console.log('define editTranslationAction in I18nConstructor')
+      console.log('you can define a mantra-action (string)')
+      console.log('or you can define a function')
+      console.log(`would edit ${translationId}`)
     },
     // shouldShowKeysAsFallback defines whether it should show the keys of translation
     // if the translation is not available (can also be reactive datasource)
     // this is usefull for admins and/or in development-environement
     shouldShowKeysAsFallback = () => false
   }) {
-    this.translationStore = translationStore;
-    this.isEditMode = isEditMode;
-    this.shouldShowKeysAsFallback = shouldShowKeysAsFallback;
-    this.editTranslationAction = editTranslationAction;
-    this.useFallbackForMissing = useFallbackForMissing;
-    this.supportedLocales = supportedLocales;
-    this.defaultLocale = defaultLocale;
-    this.changeCallbacks = [];
-    this.setLocale(defaultLocale);
+    this.translationStore = translationStore
+    this.isEditMode = isEditMode
+    this.shouldShowKeysAsFallback = shouldShowKeysAsFallback
+    this.editTranslationAction = editTranslationAction
+    this.useFallbackForMissing = useFallbackForMissing
+    this.supportedLocales = supportedLocales
+    this.defaultLocale = defaultLocale
+    this.changeCallbacks = []
+
+    if (!stateDict) {
+      throw new Error(
+        'please pass stateDict to i18nstore, which has the set/get like a Map. Usually you use ReactiveDict for that'
+      )
+    }
+    this.stateDict = stateDict
   }
   /**
 
@@ -51,17 +58,17 @@ class I18nClient {
     or by convention and have a certain fallback strategy
   **/
   t(keyOrArrayOfKeys, ...args) {
-    let key;
+    let key
     if (_.isArray(keyOrArrayOfKeys)) {
-      key = _.find(keyOrArrayOfKeys, k => this.has(k));
+      key = _.find(keyOrArrayOfKeys, k => this.has(k))
       if (_.isNil(key)) {
-        key = _.last(keyOrArrayOfKeys);
+        key = _.last(keyOrArrayOfKeys)
       }
     } else {
-      key = keyOrArrayOfKeys;
+      key = keyOrArrayOfKeys
     }
 
-    return this.tKey(key, ...args);
+    return this.tKey(key, ...args)
   }
 
   tKey(
@@ -75,40 +82,45 @@ class I18nClient {
     } = {}
   ) {
     if (!keyOrNamespace) {
-      return nullKeyValue;
+      return nullKeyValue
     }
     if (!disableEditorBypass && this.isEditMode()) {
-      return keyOrNamespace;
+      return keyOrNamespace
     }
-    let translation = this.translationStore.translate(keyOrNamespace, props);
+    let translation = this.translationStore.translate(
+      this.getLocale(),
+      keyOrNamespace,
+      props
+    )
     if (!_.isNil(translation)) {
-      return translation;
+      return translation
     }
-    const fallbackLocale = this.getFallbackLocale();
+    const fallbackLocale = this.getFallbackLocale()
     if (
       (useFallbackForMissing || this.useFallbackForMissing) &&
       this.getLocale() !== fallbackLocale
     ) {
-      translation = this.translationStore.translate(keyOrNamespace, {
-        ...props,
-        _locale: fallbackLocale
-      });
+      translation = this.translationStore.translate(
+        fallbackLocale,
+        keyOrNamespace,
+        props
+      )
     }
     // if still nil and is editor, return key if allowed
     if (!_.isNil(translation)) {
-      return translation;
+      return translation
     } else if (showKeyForMissing || this.shouldShowKeysAsFallback()) {
-      return keyOrNamespace;
+      return keyOrNamespace
     }
-    return null; // we tried :-(
+    return null // we tried :-(
   }
 
   has(keyOrNamespace) {
-    return this.translationStore.has(keyOrNamespace);
+    return this.translationStore.has(keyOrNamespace)
   }
 
   hasObject(keyOrNamespace) {
-    return this.translationStore.hasObject(keyOrNamespace);
+    return this.translationStore.hasObject(keyOrNamespace)
   }
 
   /**
@@ -119,53 +131,53 @@ class I18nClient {
   **/
   tDoc(doc, propertyKey = null) {
     // closure helpers
-    const path = locale => (propertyKey ? `${propertyKey}.${locale}` : locale);
-    const t = locale => _.get(doc, path(locale));
+    const path = locale => (propertyKey ? `${propertyKey}.${locale}` : locale)
+    const t = locale => _.get(doc, path(locale))
 
-    const translation = t(this.getLocale());
+    const translation = t(this.getLocale())
     if (!_.isNil(translation)) {
-      return translation;
+      return translation
     }
-    const fallbackLocale = this.getFallbackLocale();
+    const fallbackLocale = this.getFallbackLocale()
     if (this.useFallbackForMissing && this.getLocale() !== fallbackLocale) {
-      return t(fallbackLocale);
+      return t(fallbackLocale)
     }
-    return null; // no key fallback at the moment
+    return null // no key fallback at the moment
   }
 
   supports(locale) {
-    return this.supportedLocales.indexOf(locale) !== -1;
+    return this.supportedLocales.indexOf(locale) !== -1
   }
 
   getFallbackLocale(locale) {
     if (!locale) {
-      return this.defaultLocale;
+      return this.defaultLocale
     } else if (this.supports(locale)) {
-      return locale;
+      return locale
     }
-    const [lang] = locale.split('-');
+    const [lang] = locale.split('-')
     if (this.supports(lang)) {
-      return lang;
+      return lang
     }
-    return this.defaultLocale;
+    return this.defaultLocale
   }
 
   setLocale(locale) {
-    const fallbackLocale = this.getFallbackLocale(locale);
-    this.translationStore.setLocale(fallbackLocale);
-    this.changeCallbacks.forEach(callback => callback(fallbackLocale));
+    const fallbackLocale = this.getFallbackLocale(locale)
+    this.stateDict.set('locale', fallbackLocale)
+    this.changeCallbacks.forEach(callback => callback(fallbackLocale))
   }
   getLocale() {
-    return this.translationStore.getLocale();
+    return this.getFallbackLocale(this.stateDict.get('locale'))
   }
 
   getSupportedLocales() {
-    return this.supportedLocales;
+    return this.supportedLocales
   }
 
   onChangeLocale(callback) {
-    this.changeCallbacks.push(callback);
+    this.changeCallbacks.push(callback)
   }
 }
 
-export default I18nClient;
+export default I18nClient

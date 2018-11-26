@@ -1,11 +1,11 @@
-import React from 'react';
-import { get, noop, isString, isFunction, invokeArgs } from 'lodash/fp';
-import { pure } from 'recompose';
-import { useDeps, composeAll, compose } from '@storybook/mantra-core';
-import { mayBeStubbed } from 'react-stubber';
+import React from 'react'
+import { get, noop, isString, isFunction, invokeArgs } from 'lodash/fp'
+import { pure } from 'recompose'
+import { useDeps, composeAll, compose } from '@storybook/mantra-core'
+import { mayBeStubbed } from 'react-stubber'
 
-import composeWithTracker from './utils/composeWithTracker';
-import I18nService from './i18n_service';
+import composeWithTracker from './utils/composeWithTracker'
+import I18nService from './i18n_service'
 
 /**
 
@@ -73,55 +73,55 @@ import I18nService from './i18n_service';
 **/
 
 const getTranslationId = ({ children, _id }) =>
-  _id || (isString(children) ? children : null);
+  _id || (isString(children) ? children : null)
 
 const getTranslation = (
   i18n,
   { doc, _id, disableEditorBypass, children, ...params }
 ) => {
-  const translationId = getTranslationId({ children, _id });
+  const translationId = getTranslationId({ children, _id })
   if (doc) {
-    return i18n.tDoc(doc, translationId);
+    return i18n.tDoc(doc, translationId)
   }
-  return i18n.t(translationId, params, { disableEditorBypass });
-};
+  return i18n.t(translationId, params, { disableEditorBypass })
+}
 
 /**
 this function is outside of the composer so that it can be used in stubbing mode more easily
 **/
 const getTranslationProps = (context, { gotoEdit, ...props }) => {
-  const { i18n } = context();
-  const locale = i18n.getLocale();
-  const translationId = getTranslationId(props);
-  const translation = getTranslation(i18n, props);
+  const { i18n } = context()
+  const locale = i18n.getLocale()
+  const translationId = getTranslationId(props)
+  const translation = getTranslation(i18n, props)
 
-  let isEditMode = i18n.isEditMode();
+  let isEditMode = i18n.isEditMode()
 
   if (props.doc) {
     // no edit mode highlighting for docs yet and no gotoEdit;
     /* eslint no-param-reassign: 0*/
-    gotoEdit = noop;
-    isEditMode = false;
+    gotoEdit = noop
+    isEditMode = false
   }
-  return { translationId, gotoEdit, translation, locale, isEditMode };
-};
+  return { translationId, gotoEdit, translation, locale, isEditMode }
+}
 
 export const composer = ({ context, ...props }, onData) => {
-  onData(null, getTranslationProps(context, props));
-};
+  onData(null, getTranslationProps(context, props))
+}
 
 export const depsMapper = (context, actions) => ({
   gotoEdit: translationId => {
     if (isFunction(context.i18n.editTranslationAction)) {
       // call function
-      context.i18n.editTranslationAction(translationId);
+      context.i18n.editTranslationAction(translationId)
     } else if (isString(context.i18n.editTranslationAction)) {
       // call mantra action
-      invokeArgs(context.i18n.editTranslationAction, [translationId], actions);
+      invokeArgs(context.i18n.editTranslationAction, [translationId], actions)
     }
   },
   context: () => context
-});
+})
 
 const Component = ({
   isEditMode,
@@ -134,7 +134,7 @@ const Component = ({
   children
 }) => {
   if (isFunction(children)) {
-    return children(translation);
+    return children(translation)
   }
 
   const editorProps = {
@@ -144,11 +144,11 @@ const Component = ({
     },
     onClick: e => {
       if (isEditMode && gotoEdit) {
-        e.preventDefault();
-        gotoEdit(translationId);
+        e.preventDefault()
+        gotoEdit(translationId)
       }
     }
-  };
+  }
   return React.createElement(_tagType || 'span', {
     ..._props,
     ...editorProps,
@@ -156,21 +156,21 @@ const Component = ({
       __html: translation
     },
     key: locale
-  });
-};
+  })
+}
 
-Component.displayName = 'T';
+Component.displayName = 'T'
 
 const composeWithTrackerServerSave = get('Meteor.isServer', global)
   ? compose
-  : composeWithTracker;
+  : composeWithTracker
 const T = composeAll(
   composeWithTrackerServerSave(composer),
   useDeps(depsMapper),
   pure
-)(Component);
+)(Component)
 
-T.displayName = 'T';
+T.displayName = 'T'
 
 mayBeStubbed(T, props => {
   const stubContext = () => ({
@@ -178,13 +178,13 @@ mayBeStubbed(T, props => {
       translationStore: {
         setLocale: noop,
         getLocale: () => 'de',
-        translate: key => key
+        translate: (locale, key) => key
       },
       supportedLocales: ['de'],
       defaultLocale: 'de'
     })
-  });
-  return getTranslationProps(stubContext, props);
-});
+  })
+  return getTranslationProps(stubContext, props)
+})
 
-export default T;
+export default T

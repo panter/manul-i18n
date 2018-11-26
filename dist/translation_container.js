@@ -241,7 +241,7 @@ T.displayName = 'T';
           getLocale: function getLocale() {
             return 'de';
           },
-          translate: function translate(key) {
+          translate: function translate(locale, key) {
             return key;
           }
         },

@@ -24,6 +24,18 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
+var _isEmpty2 = require('lodash/isEmpty');
+
+var _isEmpty3 = _interopRequireDefault(_isEmpty2);
+
+var _get2 = require('lodash/get');
+
+var _get3 = _interopRequireDefault(_get2);
+
+var _has2 = require('lodash/has');
+
+var _has3 = _interopRequireDefault(_has2);
+
 var _mapValues2 = require('lodash/fp/mapValues');
 
 var _mapValues3 = _interopRequireDefault(_mapValues2);
@@ -40,50 +52,17 @@ var _flow2 = require('lodash/fp/flow');
 
 var _flow3 = _interopRequireDefault(_flow2);
 
-var _isEmpty2 = require('lodash/isEmpty');
-
-var _isEmpty3 = _interopRequireDefault(_isEmpty2);
-
-var _get2 = require('lodash/get');
-
-var _get3 = _interopRequireDefault(_get2);
-
-var _has2 = require('lodash/has');
-
-var _has3 = _interopRequireDefault(_has2);
-
 var _flat = require('flat');
 
 var _flat2 = _interopRequireDefault(_flat);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var NonReactiveVar = function () {
-  function NonReactiveVar() {
-    (0, _classCallCheck3.default)(this, NonReactiveVar);
-    this._value = null;
-  }
-
-  (0, _createClass3.default)(NonReactiveVar, [{
-    key: 'set',
-    value: function set(value) {
-      this._value = value;
-    }
-  }, {
-    key: 'get',
-    value: function get() {
-      return this._value;
-    }
-  }]);
-  return NonReactiveVar;
-}();
-
 var _class = function () {
   function _class() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
         Meteor = _ref.Meteor,
         Ground = _ref.Ground,
-        ReactiveVar = _ref.ReactiveVar,
         collection = _ref.collection,
         _ref$publicationName = _ref.publicationName,
         publicationName = _ref$publicationName === undefined ? 'translations' : _ref$publicationName,
@@ -98,13 +77,13 @@ var _class = function () {
     this.publicationName = publicationName;
     this.collection = collection;
     this.Meteor = Meteor;
-    this.ReactiveVar = ReactiveVar;
+
     this.useMethod = useMethod;
     this.subscriptions = {};
     if (this.useMethod && !Ground) {
       throw new Error('please use ground-collection if using method calls');
     }
-    this.locale = this.Meteor.isServer ? new NonReactiveVar() : new this.ReactiveVar();
+
     if (Meteor.isClient) {
       this.initClient();
     } else {
@@ -113,17 +92,6 @@ var _class = function () {
   }
 
   (0, _createClass3.default)(_class, [{
-    key: 'getLocale',
-    value: function getLocale() {
-      return this.locale.get();
-    }
-  }, {
-    key: 'setLocale',
-    value: function setLocale(locale) {
-      this.locale.set(locale);
-      this.startSubscription(locale); // restart
-    }
-  }, {
     key: 'initClient',
     value: function initClient() {
       if (this.Ground) {
@@ -212,20 +180,15 @@ var _class = function () {
     }
   }, {
     key: 'translate',
-    value: function translate(keyOrNamespace) {
+    value: function translate(locale, keyOrNamespace) {
       var _this2 = this;
 
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      var _options$_locale = options._locale,
-          _locale = _options$_locale === undefined ? this.getLocale() : _options$_locale,
-          params = (0, _objectWithoutProperties3.default)(options, ['_locale']);
       // if locale is different (e.g. fallback), subscribe to that locale as well
       // so that it will be available soon
-
-
-      if (this.Meteor.isClient && _locale !== this.getLocale()) {
-        this.startSubscription(_locale);
+      if (this.Meteor.isClient) {
+        this.startSubscription(locale);
       }
       if (!keyOrNamespace) {
         return '';
@@ -234,9 +197,9 @@ var _class = function () {
       var entryByKey = this._findEntryForKey(keyOrNamespace);
 
       if (entryByKey) {
-        return this._getValue(entryByKey, _locale, params);
+        return this._getValue(entryByKey, locale, params);
       } else if (this.useMethod || this.Meteor.isServer || this.Meteor.isClient
-      // || this.subscriptions[_locale].ready()
+      // || this.subscriptions[locale].ready()
       ) {
           // try to find for namespace
           // this is expensive, so we do it only if subscription is ready
@@ -245,7 +208,7 @@ var _class = function () {
             var _id = _ref3._id;
             return _id.length;
           }), (0, _keyBy3.default)('_id'), (0, _mapValues3.default)(function (entry) {
-            return _this2._getValue(entry, _locale, params);
+            return _this2._getValue(entry, locale, params);
           }))(entries), { overwrite: true });
           var objectForNamespace = (0, _get3.default)(fullObject, keyOrNamespace);
           if ((0, _isEmpty3.default)(objectForNamespace)) {
