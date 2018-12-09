@@ -258,6 +258,9 @@ var _class = function () {
       var open = '{$';
       var close = '}';
       var replacedString = string;
+      if (!replacedString) {
+        return replacedString;
+      }
       (0, _keys2.default)(params).forEach(function (param) {
         var substitution = (0, _get3.default)(params, param, '');
         replacedString = replacedString.split(open + param + close).join(substitution);

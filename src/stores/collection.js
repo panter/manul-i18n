@@ -192,6 +192,9 @@ export default class {
     const open = '{$'
     const close = '}'
     let replacedString = string
+    if (!replacedString) {
+      return replacedString
+    }
     Object.keys(params).forEach(param => {
       const substitution = _.get(params, param, '')
       replacedString = replacedString
