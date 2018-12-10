@@ -1,48 +1,49 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _extends2 = require('babel-runtime/helpers/extends');
+var _extends2 = require("babel-runtime/helpers/extends");
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
+var _slicedToArray2 = require("babel-runtime/helpers/slicedToArray");
 
 var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
-var _getIterator2 = require('babel-runtime/core-js/get-iterator');
+var _getIterator2 = require("babel-runtime/core-js/get-iterator");
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
 
-var _map2 = require('babel-runtime/core-js/map');
+var _map2 = require("babel-runtime/core-js/map");
 
 var _map3 = _interopRequireDefault(_map2);
 
-var _map4 = require('lodash/map');
+var _map4 = require("lodash/map");
 
 var _map5 = _interopRequireDefault(_map4);
 
-var _zipObject2 = require('lodash/zipObject');
+var _zipObject2 = require("lodash/zipObject");
 
 var _zipObject3 = _interopRequireDefault(_zipObject2);
 
-var _forEach2 = require('lodash/forEach');
+var _forEach2 = require("lodash/forEach");
 
 var _forEach3 = _interopRequireDefault(_forEach2);
 
-var _isEmpty2 = require('lodash/isEmpty');
+var _isEmpty2 = require("lodash/isEmpty");
 
 var _isEmpty3 = _interopRequireDefault(_isEmpty2);
 
-var _flat = require('flat');
+var _flat = require("flat");
 
 var _flat2 = _interopRequireDefault(_flat);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/* eslint no-shadow: 0*/
+/* eslint no-shadow: 0 */
+/* eslint-disable no-console */
 exports.default = function () {
   var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$override = _ref.override,
@@ -50,12 +51,14 @@ exports.default = function () {
       translations = _ref.translations,
       collection = _ref.collection,
       _ref$locales = _ref.locales,
-      locales = _ref$locales === undefined ? ['de', 'en', 'it', 'fr'] : _ref$locales;
+      locales = _ref$locales === undefined ? ["de", "en", "it", "fr"] : _ref$locales,
+      _ref$verbose = _ref.verbose,
+      verbose = _ref$verbose === undefined ? true : _ref$verbose;
 
   var entries = new _map3.default();
 
   var valueKeyForLocale = function valueKeyForLocale(locale) {
-    return 'value_' + locale;
+    return "value_" + locale;
   };
   locales.forEach(function (locale) {
     var translationsForLocale = translations[locale];
@@ -74,7 +77,7 @@ exports.default = function () {
     }
   });
 
-  console.log('--- importing i18n into collection --');
+  console.log("--- importing i18n into collection --");
   /* eslint no-restricted-syntax: 0*/
   var _iteratorNormalCompletion = true;
   var _didIteratorError = false;
@@ -89,13 +92,17 @@ exports.default = function () {
       if (collection.findOne(key)) {
         if (override) {
           collection.update(key, { $set: value });
-          console.log('updated', key);
-        } else {
-          // console.log('skipped', key);
+          if (verbose) {
+            console.log("updated", key);
+          }
+        } else if (verbose) {
+          console.log("skipped", key);
         }
       } else {
         collection.insert((0, _extends3.default)({ _id: key }, value));
-        console.log('inserted', key);
+        if (verbose) {
+          console.log("inserted", key);
+        }
       }
     }
   } catch (err) {
