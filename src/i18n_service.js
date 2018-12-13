@@ -87,25 +87,15 @@ class I18nClient {
     if (!disableEditorBypass && this.isEditMode()) {
       return keyOrNamespace
     }
-    let translation = this.translationStore.translate(
+    const translation = this.translationStore.translate(
       this.getLocale(),
       keyOrNamespace,
-      props
+      props,
+      useFallbackForMissing || this.useFallbackForMissing
+        ? this.getFallbackLocale()
+        : undefined
     )
-    if (!_.isNil(translation)) {
-      return translation
-    }
-    const fallbackLocale = this.getFallbackLocale()
-    if (
-      (useFallbackForMissing || this.useFallbackForMissing) &&
-      this.getLocale() !== fallbackLocale
-    ) {
-      translation = this.translationStore.translate(
-        fallbackLocale,
-        keyOrNamespace,
-        props
-      )
-    }
+
     // if still nil and is editor, return key if allowed
     if (!_.isNil(translation)) {
       return translation

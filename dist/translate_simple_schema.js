@@ -41,6 +41,7 @@ exports.default = function (_ref) {
     var schema = (0, _cloneDeep3.default)(schemaOrg);
     // translate all the labels
     var translations = i18n.t(namespace);
+    console.log(translations);
 
     var _translateSchemaObject = function _translateSchemaObject() {
       var parentFieldFullName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -85,7 +86,9 @@ exports.default = function (_ref) {
     // we do not use the locale feature of simpleschema (yet),
     // instead we just add the right translations
     // to the default locale (en) in messagebox
-    schema.messageBox.messages({ en: (0, _eval_simpleschema_regex_keys2.default)(i18n.t('simpleSchema')) });
+    schema.messageBox.messages({
+      en: (0, _eval_simpleschema_regex_keys2.default)(i18n.t('simpleSchema'))
+    });
 
     return schema;
   };

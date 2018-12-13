@@ -136,14 +136,8 @@ var I18nClient = function () {
       if (!disableEditorBypass && this.isEditMode()) {
         return keyOrNamespace;
       }
-      var translation = this.translationStore.translate(this.getLocale(), keyOrNamespace, props);
-      if (!(0, _isNil3.default)(translation)) {
-        return translation;
-      }
-      var fallbackLocale = this.getFallbackLocale();
-      if ((useFallbackForMissing || this.useFallbackForMissing) && this.getLocale() !== fallbackLocale) {
-        translation = this.translationStore.translate(fallbackLocale, keyOrNamespace, props);
-      }
+      var translation = this.translationStore.translate(this.getLocale(), keyOrNamespace, props, useFallbackForMissing || this.useFallbackForMissing ? this.getFallbackLocale() : undefined);
+
       // if still nil and is editor, return key if allowed
       if (!(0, _isNil3.default)(translation)) {
         return translation;

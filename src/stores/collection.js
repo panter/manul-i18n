@@ -112,21 +112,30 @@ export default class {
   getValueKey(locale) {
     return `value_${locale}`
   }
-  _getValue(entry, locale, params) {
+  _getValue(entry, locale, params, fallbackLocale) {
     if (_.has(entry, this.getValueKey(locale))) {
       return this._replaceParamsInString(
         _.get(entry, this.getValueKey(locale)),
         params
       )
     }
+    if (_.has(entry, this.getValueKey(fallbackLocale))) {
+      return this._replaceParamsInString(
+        _.get(entry, this.getValueKey(fallbackLocale)),
+        params
+      )
+    }
     return null
   }
 
-  translate(locale, keyOrNamespace, params = {}) {
+  translate(locale, keyOrNamespace, params = {}, fallbackLocale) {
     // if locale is different (e.g. fallback), subscribe to that locale as well
     // so that it will be available soon
     if (this.Meteor.isClient) {
       this.startSubscription(locale)
+      if (fallbackLocale && fallbackLocale !== locale) {
+        this.startSubscription(fallbackLocale)
+      }
     }
     if (!keyOrNamespace) {
       return ''
@@ -135,7 +144,7 @@ export default class {
     const entryByKey = this._findEntryForKey(keyOrNamespace)
 
     if (entryByKey) {
-      return this._getValue(entryByKey, locale, params)
+      return this._getValue(entryByKey, locale, params, fallbackLocale)
     } else if (
       this.useMethod ||
       this.Meteor.isServer ||
@@ -149,7 +158,9 @@ export default class {
         flow(
           sortBy(({ _id }) => _id.length),
           keyBy('_id'),
-          mapValues(entry => this._getValue(entry, locale, params))
+          mapValues(entry =>
+            this._getValue(entry, locale, params, fallbackLocale)
+          )
         )(entries),
         { overwrite: true }
       )

@@ -172,9 +172,12 @@ var _class = function () {
     }
   }, {
     key: '_getValue',
-    value: function _getValue(entry, locale, params) {
+    value: function _getValue(entry, locale, params, fallbackLocale) {
       if ((0, _has3.default)(entry, this.getValueKey(locale))) {
         return this._replaceParamsInString((0, _get3.default)(entry, this.getValueKey(locale)), params);
+      }
+      if ((0, _has3.default)(entry, this.getValueKey(fallbackLocale))) {
+        return this._replaceParamsInString((0, _get3.default)(entry, this.getValueKey(fallbackLocale)), params);
       }
       return null;
     }
@@ -184,11 +187,15 @@ var _class = function () {
       var _this2 = this;
 
       var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var fallbackLocale = arguments[3];
 
       // if locale is different (e.g. fallback), subscribe to that locale as well
       // so that it will be available soon
       if (this.Meteor.isClient) {
         this.startSubscription(locale);
+        if (fallbackLocale && fallbackLocale !== locale) {
+          this.startSubscription(fallbackLocale);
+        }
       }
       if (!keyOrNamespace) {
         return '';
@@ -197,7 +204,7 @@ var _class = function () {
       var entryByKey = this._findEntryForKey(keyOrNamespace);
 
       if (entryByKey) {
-        return this._getValue(entryByKey, locale, params);
+        return this._getValue(entryByKey, locale, params, fallbackLocale);
       } else if (this.useMethod || this.Meteor.isServer || this.Meteor.isClient
       // || this.subscriptions[locale].ready()
       ) {
@@ -208,7 +215,7 @@ var _class = function () {
             var _id = _ref3._id;
             return _id.length;
           }), (0, _keyBy3.default)('_id'), (0, _mapValues3.default)(function (entry) {
-            return _this2._getValue(entry, locale, params);
+            return _this2._getValue(entry, locale, params, fallbackLocale);
           }))(entries), { overwrite: true });
           var objectForNamespace = (0, _get3.default)(fullObject, keyOrNamespace);
           if ((0, _isEmpty3.default)(objectForNamespace)) {
