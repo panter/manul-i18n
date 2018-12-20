@@ -41,7 +41,6 @@ exports.default = function (_ref) {
     var schema = (0, _cloneDeep3.default)(schemaOrg);
     // translate all the labels
     var translations = i18n.t(namespace);
-    console.log(translations);
 
     var _translateSchemaObject = function _translateSchemaObject() {
       var parentFieldFullName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
