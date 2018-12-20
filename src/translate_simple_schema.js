@@ -11,7 +11,7 @@ export default ({ i18n, SimpleSchema }) => (schemaOrg, namespace) => {
   const schema = _.cloneDeep(schemaOrg)
   // translate all the labels
   const translations = i18n.t(namespace)
-  console.log(translations)
+
 
   const _translateSchemaObject = (
     parentFieldFullName = null,
